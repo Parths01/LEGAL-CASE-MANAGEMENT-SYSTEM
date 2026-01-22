@@ -1,0 +1,330 @@
+/* ===================================
+   SMART LEGAL CASE MANAGEMENT SYSTEM
+   Main Stylesheet
+   =================================== */
+
+:root {
+    --primary: #0b1c2d;
+    --secondary: #d4af37;
+    --light: #f5f7fa;
+    --dark: #121212;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --white: #ffffff;
+    --gray: #6c757d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* Navbar Styling */
+.navbar {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a3a52 100%);
+    padding: 1rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--secondary) !important;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--secondary) !important;
+}
+
+.btn-register {
+    background: var(--secondary);
+    color: var(--dark) !important;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a3a52 100%);
+    color: white;
+    padding: 100px 0;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    animation: fadeInUp 1s ease;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--secondary);
+    margin-bottom: 15px;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.hero-buttons .btn {
+    margin: 10px 10px 10px 0;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--secondary);
+    border: none;
+    color: var(--dark);
+}
+
+.btn-primary:hover {
+    background: #c4991f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn-outline-light {
+    border: 2px solid white;
+}
+
+.btn-outline-light:hover {
+    background: white;
+    color: var(--primary);
+}
+
+.hero-image {
+    max-width: 100%;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Features Section */
+.features-section {
+    padding: 80px 0;
+}
+
+.section-header {
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.section-header p {
+    font-size: 1.2rem;
+    color: var(--gray);
+}
+
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), #1a3a52);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    color: var(--gray);
+}
+
+/* About Section */
+.about-section {
+    padding: 80px 0;
+    background: white;
+}
+
+.about-section h2 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.about-features {
+    list-style: none;
+    padding: 0;
+}
+
+.about-features li {
+    padding: 10px 0;
+    font-size: 1.1rem;
+}
+
+.about-features i {
+    color: var(--success);
+    margin-right: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, var(--primary), #1a3a52);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.stat-box h3 {
+    font-size: 2.5rem;
+    color: var(--secondary);
+    margin-bottom: 10px;
+}
+
+/* Testimonials */
+.testimonials-section {
+    padding: 80px 0;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.testimonial-card p {
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.testimonial-author strong {
+    display: block;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.testimonial-author span {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+/* Footer */
+.footer {
+    background: var(--primary);
+    color: white;
+    padding: 50px 0 20px;
+    margin-top: 50px;
+}
+
+.footer h4, .footer h5 {
+    color: var(--secondary);
+    margin-bottom: 20px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

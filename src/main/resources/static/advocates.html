@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advocates - Smart Legal CMS</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+        .search-filter-group { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+        .search-box { position: relative; flex: 1; min-width: 260px; }
+        .search-box input { padding: 10px 15px 10px 40px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .filter-select { padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; min-width: 160px; }
+        .table-wrapper { overflow-x: auto; }
+        .styled-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .styled-table thead { background: linear-gradient(135deg, #0b1c2d, #1a3a52); color: white; }
+        .styled-table th, .styled-table td { padding: 14px 12px; font-size: 0.9rem; text-align: left; }
+        .styled-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; }
+        .styled-table tbody tr:hover { background: #f8f9fa; }
+        .action-buttons { display: flex; gap: 8px; }
+        .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+        .btn-view { background: #2196f3; color: white; } .btn-view:hover { background: #1976d2; }
+        .btn-edit { background: #ff9800; color: white; } .btn-edit:hover { background: #f57c00; }
+        .btn-delete { background: #f44336; color: white; } .btn-delete:hover { background: #d32f2f; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; color: #ddd; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        .stat-icon.blue { background: linear-gradient(135deg, #2196f3, #1976d2); }
+        .stat-icon.orange { background: linear-gradient(135deg, #ff9800, #f57c00); }
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0b1c2d; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+        .modal { display: none; position: fixed; z-index: 2000; inset: 0; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 4% auto; border-radius: 12px; width: 90%; max-width: 800px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .modal-header { padding: 20px 24px; background: linear-gradient(135deg, #0b1c2d, #1a3a52); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; background: #f8f9fa; display: flex; justify-content: flex-end; gap: 10px; }
+        .close { color: white; font-size: 1.8rem; cursor: pointer; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-modal { padding: 10px 22px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-modal-primary { background: linear-gradient(135deg, #0b1c2d, #1a3a52); color: white; }
+        .btn-modal-secondary { background: #6c757d; color: white; }
+        @media (max-width: 768px) { .main-content { margin-left: 0; } .sidebar { transform: translateX(-100%); } }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-balance-scale"></i>
+            <h4>Legal CMS</h4>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="cases.html"><i class="fas fa-folder-open"></i> Cases</a></li>
+            <li><a href="advocates.html" class="active"><i class="fas fa-user-tie"></i> Advocates</a></li>
+            <li><a href="clients.html"><i class="fas fa-users"></i> Clients</a></li>
+            <li><a href="hearings.html"><i class="fas fa-gavel"></i> Hearings</a></li>
+            <li><a href="documents.html"><i class="fas fa-file-alt"></i> Documents</a></li>
+            <li><a href="invoices.html"><i class="fas fa-file-invoice-dollar"></i> Invoices</a></li>
+            <li><a href="payments.html"><i class="fas fa-credit-card"></i> Payments</a></li>
+            <li><a href="legal-notices.html"><i class="fas fa-envelope-open-text"></i> Legal Notices</a></li>
+            <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1><i class="fas fa-user-tie"></i> Advocates</h1>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div>
+                    <strong id="userName">Admin</strong><br>
+                    <small class="text-muted">Administrator</small>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div>
+                    <h3 id="totalAdvocates">0</h3>
+                    <p>Total Advocates</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-briefcase"></i></div>
+                <div>
+                    <h3 id="specializationCount">0</h3>
+                    <p>With Specialization</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-card">
+            <div class="table-header">
+                <div class="search-filter-group">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by name, bar number, or specialization...">
+                    </div>
+                    <select class="filter-select" id="specializationFilter">
+                        <option value="">All Specializations</option>
+                        <option value="Criminal">Criminal</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Corporate">Corporate</option>
+                        <option value="Family">Family</option>
+                        <option value="Tax">Tax</option>
+                        <option value="Property">Property</option>
+                        <option value="Labour">Labour</option>
+                    </select>
+                    <select class="filter-select" id="experienceFilter">
+                        <option value="">All Experience</option>
+                        <option value="0-3">0-3 years</option>
+                        <option value="4-7">4-7 years</option>
+                        <option value="8-12">8-12 years</option>
+                        <option value="13+">13+ years</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="styled-table" id="advocatesTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Bar Number</th>
+                            <th>Specialization</th>
+                            <th>Experience</th>
+                            <th>Qualification</th>
+                            <th>Court Practice</th>
+                            <th>Law Firm</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="advocatesTableBody">
+                        <tr>
+                            <td colspan="9">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    <p>Loading advocates...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-eye"></i> Advocate Details</h2>
+                <span class="close" onclick="closeViewModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="advocateDetails"></div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-modal-secondary" onclick="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Advocate</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editAdvocateId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="barNumber">Bar Registration Number</label>
+                            <input type="text" id="barNumber" placeholder="e.g., GJ/2020/12345">
+                        </div>
+                        <div class="form-group">
+                            <label for="specialization">Specialization</label>
+                            <input type="text" id="specialization" placeholder="e.g., Criminal Law">
+                        </div>
+                        <div class="form-group">
+                            <label for="experienceYears">Experience (years)</label>
+                            <input type="number" id="experienceYears" min="0" placeholder="e.g., 5">
+                        </div>
+                        <div class="form-group">
+                            <label for="qualification">Qualification</label>
+                            <input type="text" id="qualification" placeholder="e.g., LLB, LLM">
+                        </div>
+                        <div class="form-group">
+                            <label for="courtPractice">Court Practice</label>
+                            <input type="text" id="courtPractice" placeholder="e.g., High Court">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
+                <button class="btn-modal btn-modal-primary" onclick="saveAdvocate()"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allAdvocates = [];
+        let filteredAdvocates = [];
+        const token = localStorage.getItem('token');
+
+        if (!token) { window.location.href = 'login.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadAdvocates();
+            setupEvents();
+        });
+
+        function loadUserInfo() {
+            const userName = localStorage.getItem('userName');
+            if (userName) { document.getElementById('userName').textContent = userName; }
+        }
+
+        function setupEvents() {
+            document.getElementById('searchInput').addEventListener('input', filterAdvocates);
+            document.getElementById('specializationFilter').addEventListener('change', filterAdvocates);
+            document.getElementById('experienceFilter').addEventListener('change', filterAdvocates);
+        }
+
+        async function loadAdvocates() {
+            try {
+                const res = await fetch('/api/advocates', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) {
+                    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return; }
+                    throw new Error('Failed to load advocates');
+                }
+                allAdvocates = await res.json();
+                filteredAdvocates = [...allAdvocates];
+                updateStats();
+                renderTable();
+            } catch (e) {
+                console.error(e);
+                showEmpty('Error loading advocates');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalAdvocates').textContent = allAdvocates.length;
+            document.getElementById('specializationCount').textContent = allAdvocates.filter(a => !!a.specialization).length;
+        }
+
+        function filterAdvocates() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const spec = document.getElementById('specializationFilter').value.toLowerCase();
+            const exp = document.getElementById('experienceFilter').value;
+            filteredAdvocates = allAdvocates.filter(a => {
+                const matchesSearch = (a.user?.name || '').toLowerCase().includes(q)
+                    || (a.barRegistrationNumber || '').toLowerCase().includes(q)
+                    || (a.specialization || '').toLowerCase().includes(q);
+                const matchesSpec = !spec || (a.specialization || '').toLowerCase().includes(spec);
+                const years = a.experienceYears || 0;
+                const matchesExp = !exp || (
+                    (exp === '0-3' && years <= 3) ||
+                    (exp === '4-7' && years >= 4 && years <= 7) ||
+                    (exp === '8-12' && years >= 8 && years <= 12) ||
+                    (exp === '13+' && years >= 13)
+                );
+                return matchesSearch && matchesSpec && matchesExp;
+            });
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('advocatesTableBody');
+            if (filteredAdvocates.length === 0) { showEmpty('No advocates found'); return; }
+            tbody.innerHTML = filteredAdvocates.map(a => `
+                <tr>
+                    <td><strong>${escapeHtml(a.user?.name || 'N/A')}</strong></td>
+                    <td>${escapeHtml(a.user?.email || 'N/A')}</td>
+                    <td>${escapeHtml(a.barRegistrationNumber || '—')}</td>
+                    <td>${escapeHtml(a.specialization || '—')}</td>
+                    <td>${a.experienceYears ?? '—'}</td>
+                    <td>${escapeHtml(a.qualification || '—')}</td>
+                    <td>${escapeHtml(a.courtPractice || '—')}</td>
+                    <td>${escapeHtml(a.lawFirm?.firmName || '—')}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-view" onclick="viewAdvocate(${a.advocateId})" title="View"><i class="fas fa-eye"></i></button>
+                            <button class="btn-action btn-edit" onclick="editAdvocate(${a.advocateId})" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete" onclick="deleteAdvocate(${a.advocateId})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showEmpty(message) {
+            document.getElementById('advocatesTableBody').innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <i class="fas fa-user-tie"></i>
+                            <h3>${message}</h3>
+                            <p>Try changing filters or check data sources.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        async function viewAdvocate(id) {
+            try {
+                const res = await fetch(`/api/advocates/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) { alert('Failed to load details'); return; }
+                const a = await res.json();
+                const html = `
+                    <div class="form-grid">
+                        <div class="form-group"><label>Name</label><p><strong>${escapeHtml(a.user?.name || 'N/A')}</strong></p></div>
+                        <div class="form-group"><label>Email</label><p>${escapeHtml(a.user?.email || 'N/A')}</p></div>
+                        <div class="form-group"><label>Bar Number</label><p>${escapeHtml(a.barRegistrationNumber || '—')}</p></div>
+                        <div class="form-group"><label>Specialization</label><p>${escapeHtml(a.specialization || '—')}</p></div>
+                        <div class="form-group"><label>Experience</label><p>${a.experienceYears ?? '—'} years</p></div>
+                        <div class="form-group"><label>Qualification</label><p>${escapeHtml(a.qualification || '—')}</p></div>
+                        <div class="form-group"><label>Court Practice</label><p>${escapeHtml(a.courtPractice || '—')}</p></div>
+                        <div class="form-group"><label>Law Firm</label><p>${escapeHtml(a.lawFirm?.firmName || '—')}</p></div>
+                    </div>`;
+                document.getElementById('advocateDetails').innerHTML = html;
+                document.getElementById('viewModal').style.display = 'block';
+            } catch (e) { console.error(e); alert('Error loading details'); }
+        }
+
+        async function editAdvocate(id) {
+            try {
+                const res = await fetch(`/api/advocates/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) { alert('Failed to load advocate'); return; }
+                const a = await res.json();
+                document.getElementById('editAdvocateId').value = a.advocateId;
+                document.getElementById('barNumber').value = a.barRegistrationNumber || '';
+                document.getElementById('specialization').value = a.specialization || '';
+                document.getElementById('experienceYears').value = a.experienceYears ?? '';
+                document.getElementById('qualification').value = a.qualification || '';
+                document.getElementById('courtPractice').value = a.courtPractice || '';
+                document.getElementById('editModal').style.display = 'block';
+            } catch (e) { console.error(e); alert('Error loading advocate'); }
+        }
+
+        async function saveAdvocate() {
+            const id = document.getElementById('editAdvocateId').value;
+            const payload = {
+                barRegistrationNumber: document.getElementById('barNumber').value || null,
+                specialization: document.getElementById('specialization').value || null,
+                experienceYears: document.getElementById('experienceYears').value ? parseInt(document.getElementById('experienceYears').value) : null,
+                qualification: document.getElementById('qualification').value || null,
+                courtPractice: document.getElementById('courtPractice').value || null
+            };
+            try {
+                const res = await fetch(`/api/advocates/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) { const t = await res.text(); alert('Failed to save: ' + t); return; }
+                closeEditModal();
+                loadAdvocates();
+                alert('Advocate updated successfully');
+            } catch (e) { console.error(e); alert('Error saving advocate'); }
+        }
+
+        async function deleteAdvocate(id) {
+            if (!confirm('Delete this advocate?')) return;
+            try {
+                const res = await fetch(`/api/advocates/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) { alert('Failed to delete'); return; }
+                loadAdvocates();
+                alert('Advocate deleted successfully');
+            } catch (e) { console.error(e); alert('Error deleting advocate'); }
+        }
+
+        function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+        window.onclick = (e) => {
+            if (e.target === document.getElementById('viewModal')) closeViewModal();
+            if (e.target === document.getElementById('editModal')) closeEditModal();
+        };
+
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text ?? ''; return div.innerHTML; }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    </script>
+</body>
+</html>
