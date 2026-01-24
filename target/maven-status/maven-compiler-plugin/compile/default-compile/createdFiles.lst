@@ -23,7 +23,9 @@ com/legal/dto/LoginRequest.class
 com/legal/controller/AuthController.class
 com/legal/security/SecurityConfig.class
 com/legal/entity/Case$CaseType.class
+com/legal/controller/CaseController.class
 com/legal/repository/HearingRepository.class
+com/legal/controller/ClientController.class
 com/legal/dto/JwtResponse.class
 com/legal/entity/Case$CaseBuilder.class
 com/legal/entity/Invoice$InvoiceStatus.class
@@ -51,6 +53,7 @@ com/legal/entity/Case$Priority.class
 com/legal/repository/AuditLogRepository.class
 com/legal/entity/Hearing$HearingType.class
 com/legal/entity/LegalNotice$NoticeStatus.class
+com/legal/controller/AdvocateController.class
 com/legal/entity/Invoice.class
 com/legal/repository/DocumentRepository.class
 com/legal/entity/Case$CourtType.class

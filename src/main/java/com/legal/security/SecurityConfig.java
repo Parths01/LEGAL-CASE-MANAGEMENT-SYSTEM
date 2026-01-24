@@ -75,6 +75,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                 
                 // Advocate endpoints
+                // Core domain APIs
+                .requestMatchers("/api/advocates/**").hasAnyRole("ADMIN", "ADVOCATE", "CLIENT")
+                .requestMatchers("/api/clients/**").hasAnyRole("ADMIN", "ADVOCATE", "CLIENT")
                 .requestMatchers("/api/cases/**", "/api/hearings/**").hasAnyRole("ADMIN", "ADVOCATE")
                 .requestMatchers("/api/documents/**").hasAnyRole("ADMIN", "ADVOCATE", "CLIENT")
                 
