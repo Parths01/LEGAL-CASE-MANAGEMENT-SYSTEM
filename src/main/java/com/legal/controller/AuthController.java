@@ -43,7 +43,7 @@ public class AuthController {
             User user = userRepository.findByEmail(loginRequest.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            JwtResponse response = new JwtResponse(jwt, user.getEmail(), user.getName(), user.getRole().name());
+            JwtResponse response = new JwtResponse(jwt, user.getUserId(), user.getEmail(), user.getName(), user.getRole().name());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

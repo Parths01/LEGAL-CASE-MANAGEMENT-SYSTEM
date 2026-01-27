@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Smart Legal CMS</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-header h5 {
+            margin: 0;
+            color: #0b1c2d;
+            font-weight: 600;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #0b1c2d, #1a3a52);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(11, 28, 45, 0.3);
+        }
+
+        .profile-info-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            flex: 0 0 180px;
+            font-weight: 600;
+            color: #0b1c2d;
+        }
+
+        .profile-value {
+            flex: 1;
+            color: #555;
+        }
+
+        .profile-value input,
+        .profile-value textarea,
+        .profile-value select {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-value input:focus,
+        .profile-value textarea:focus,
+        .profile-value select:focus {
+            outline: none;
+            border-color: #0b1c2d;
+            box-shadow: 0 0 0 3px rgba(11, 28, 45, 0.1);
+        }
+
+        .profile-value input[readonly],
+        .profile-value textarea[readonly] {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+        }
+
+        .badge-custom {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #0b1c2d, #1a3a52);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(11, 28, 45, 0.3);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-balance-scale"></i>
+            <h4>Legal CMS</h4>
+        </div>
+        <ul class="sidebar-menu">
+            <!-- Dynamically populated by nav.js -->
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1><i class="fas fa-user-circle"></i> Profile</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatarTop">A</div>
+                <div>
+                    <strong id="userNameDisplay">Loading...</strong><br>
+                    <small class="text-muted" id="roleDisplay">ROLE</small>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">>
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="profile-container">
+                        <div class="text-center">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h5 id="profileName">Loading...</h5>
+                            <p class="text-muted mb-2" id="profileEmail">email@example.com</p>
+                            <span class="badge badge-custom bg-primary" id="profileRole">ROLE</span>
+                            <span class="badge badge-custom bg-success ms-2" id="profileStatus">STATUS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 mb-4">
+                    <div class="profile-container">
+                        <div class="profile-header">
+                            <h5><i class="fas fa-info-circle"></i> User Information</h5>
+                            <div>
+                                <button class="btn-edit" id="editBtn" onclick="enableEdit()" style="display: none;">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <div id="editButtons" style="display: none;">
+                                    <button class="btn-save me-2" onclick="saveProfile()">
+                                        <i class="fas fa-save"></i> Save
+                                    </button>
+                                    <button class="btn-cancel" onclick="cancelEdit()">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">User ID:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="userId" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Name:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="userName" readonly>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Email:</div>
+                                <div class="profile-value">
+                                    <input type="email" id="userEmail" readonly>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Phone:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="userPhone" readonly>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Address:</div>
+                                <div class="profile-value">
+                                    <textarea id="userAddress" rows="2" readonly></textarea>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Role:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="userRoleField" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Status:</div>
+                                <div class="profile-value">
+                                    <select id="userStatus" disabled>
+                                        <option value="ACTIVE">Active</option>
+                                        <option value="INACTIVE">Inactive</option>
+                                        <option value="SUSPENDED">Suspended</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Created At:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="createdAt" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Last Updated:</div>
+                                <div class="profile-value">
+                                    <input type="text" id="updatedAt" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Details Section (Role-specific) -->
+            <div class="row" id="roleSpecificSection" style="display: none;">
+                <div class="col-12">
+                    <div class="profile-container">
+                        <div class="profile-header">
+                            <h5 id="roleSpecificTitle"><i class="fas fa-briefcase"></i> Professional Details</h5>
+                        </div>
+                        <div id="roleSpecificContent">
+                            <!-- Dynamically populated based on role -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script>
+        let originalData = {};
+        let currentUserId = null;
+        let isAdmin = false;
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            window.location.href = 'login.html';
+        }
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('userRole');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            // Check if user is admin
+            isAdmin = role === 'ADMIN';
+            if (isAdmin) {
+                document.getElementById('editBtn').style.display = 'block';
+            }
+            
+            return token;
+        }
+
+        // Load user profile
+        async function loadProfile() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const userId = localStorage.getItem('userId');
+                if (!userId) {
+                    throw new Error('User ID not found');
+                }
+                currentUserId = userId;
+
+                const response = await fetch(`/api/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load profile');
+                }
+
+                const user = await response.json();
+                originalData = { ...user };
+                displayProfile(user);
+                
+                // Load role-specific details
+                if (user.role === 'ADVOCATE') {
+                    await loadAdvocateDetails(userId);
+                } else if (user.role === 'CLIENT') {
+                    await loadClientDetails(userId);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                alert('Error loading profile: ' + error.message);
+            }
+        }
+
+        // Display profile data
+        function displayProfile(user) {
+            // Top bar info
+            const initials = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+            document.getElementById('userAvatarTop').textContent = initials;
+            document.getElementById('userNameDisplay').textContent = user.name || 'User';
+            document.getElementById('roleDisplay').textContent = user.role || 'ROLE';
+
+            // Sidebar info
+            document.getElementById('profileName').textContent = user.name || 'N/A';
+            document.getElementById('profileEmail').textContent = user.email || 'N/A';
+            document.getElementById('profileRole').textContent = user.role || 'N/A';
+            document.getElementById('profileStatus').textContent = user.status || 'ACTIVE';
+            document.getElementById('profileStatus').className = `badge badge-custom ms-2 ${user.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'}`;
+
+            // Form fields
+            document.getElementById('userId').value = user.userId || 'N/A';
+            document.getElementById('userName').value = user.name || '';
+            document.getElementById('userEmail').value = user.email || '';
+            document.getElementById('userPhone').value = user.phone || '';
+            document.getElementById('userAddress').value = user.address || '';
+            document.getElementById('userRoleField').value = user.role || 'N/A';
+            document.getElementById('userStatus').value = user.status || 'ACTIVE';
+            document.getElementById('createdAt').value = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A';
+            document.getElementById('updatedAt').value = user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'N/A';
+        }
+
+        // Load advocate-specific details
+        async function loadAdvocateDetails(userId) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/advocates', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const advocates = await response.json();
+                    const advocate = advocates.find(a => a.user.userId == userId);
+                    
+                    if (advocate) {
+                        document.getElementById('roleSpecificSection').style.display = 'block';
+                        document.getElementById('roleSpecificTitle').innerHTML = '<i class="fas fa-balance-scale"></i> Advocate Details';
+                        document.getElementById('roleSpecificContent').innerHTML = `
+                            <div class="profile-info-row">
+                                <div class="profile-label">Advocate ID:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${advocate.advocateId || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">License Number:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${advocate.licenseNumber || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Specialization:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${advocate.specialization || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Experience:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${advocate.experience ? advocate.experience + ' years' : 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Law Firm:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${advocate.lawFirm?.firmName || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading advocate details:', error);
+            }
+        }
+
+        // Load client-specific details
+        async function loadClientDetails(userId) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/clients', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const clients = await response.json();
+                    const client = clients.find(c => c.user.userId == userId);
+                    
+                    if (client) {
+                        document.getElementById('roleSpecificSection').style.display = 'block';
+                        document.getElementById('roleSpecificTitle').innerHTML = '<i class="fas fa-user"></i> Client Details';
+                        document.getElementById('roleSpecificContent').innerHTML = `
+                            <div class="profile-info-row">
+                                <div class="profile-label">Client ID:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${client.clientId || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Client Type:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${client.clientType || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-label">Company Name:</div>
+                                <div class="profile-value">
+                                    <input type="text" value="${client.companyName || 'N/A'}" readonly style="background: transparent; border: none;">
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading client details:', error);
+            }
+        }
+
+        // Enable edit mode (Admin only)
+        function enableEdit() {
+            if (!isAdmin) {
+                alert('Only administrators can edit user profiles');
+                return;
+            }
+
+            document.getElementById('userName').removeAttribute('readonly');
+            document.getElementById('userEmail').removeAttribute('readonly');
+            document.getElementById('userPhone').removeAttribute('readonly');
+            document.getElementById('userAddress').removeAttribute('readonly');
+            document.getElementById('userStatus').removeAttribute('disabled');
+
+            document.getElementById('editBtn').style.display = 'none';
+            document.getElementById('editButtons').style.display = 'block';
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            displayProfile(originalData);
+            
+            document.getElementById('userName').setAttribute('readonly', true);
+            document.getElementById('userEmail').setAttribute('readonly', true);
+            document.getElementById('userPhone').setAttribute('readonly', true);
+            document.getElementById('userAddress').setAttribute('readonly', true);
+            document.getElementById('userStatus').setAttribute('disabled', true);
+
+            document.getElementById('editBtn').style.display = 'block';
+            document.getElementById('editButtons').style.display = 'none';
+        }
+
+        // Save profile (Admin only)
+        async function saveProfile() {
+            if (!isAdmin) {
+                alert('Only administrators can update user profiles');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const updatedUser = {
+                userId: currentUserId,
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                phone: document.getElementById('userPhone').value,
+                address: document.getElementById('userAddress').value,
+                status: document.getElementById('userStatus').value,
+                role: originalData.role // Keep original role
+            };
+
+            try {
+                const response = await fetch(`/api/users/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedUser)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update profile');
+                }
+
+                alert('Profile updated successfully!');
+                originalData = updatedUser;
+                cancelEdit();
+                
+                // Update localStorage if editing own profile
+                if (localStorage.getItem('userId') == currentUserId) {
+                    localStorage.setItem('userName', updatedUser.name);
+                }
+                
+                // Reload to reflect changes
+                await loadProfile();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Error updating profile: ' + error.message);
+            }
+        }
+
+        // Initialize page
+        window.onload = async function() {
+            checkAuth();
+            await loadProfile();
+        };
+    </script>
+</body>
+</html>

@@ -61,7 +61,8 @@ public class SecurityConfig {
                     "/", "/index.html", "/login.html", "/register.html", "/forgot-password.html",
                     "/admin-dashboard.html", "/advocate-dashboard.html", "/client-dashboard.html", "/dashboard.html",
                     "/cases.html", "/advocates.html", "/clients.html", "/hearings.html", "/documents.html",
-                    "/invoices.html", "/payments.html", "/legal-notices.html", "/reports.html", "/settings.html"
+                    "/invoices.html", "/payments.html", "/legal-notices.html", "/reports.html", "/settings.html",
+                    "/profile.html", "/add-case.html"
                 ).permitAll()
                 .requestMatchers("/assets/**", "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
                 .requestMatchers("/favicon.ico", "/error").permitAll()

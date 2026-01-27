@@ -10,6 +10,7 @@
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/entity/LawFirm.java
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/entity/Hearing.java
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/repository/InvoiceRepository.java
+/home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/controller/UserController.java
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/repository/LawFirmRepository.java
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/dto/ApiResponse.java
 /home/parth/IdeaProjects/LEGAL CASE MANAGEMENT SYSTEM/src/main/java/com/legal/controller/ClientController.java

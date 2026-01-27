@@ -36,8 +36,11 @@
     <div class="main-content">
         <!-- Top Bar -->
         <div class="top-bar">
-            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard <span id="refreshIndicator" style="font-size: 0.6rem; color: #4caf50; margin-left: 10px; display: none;"><i class="fas fa-sync-alt fa-spin"></i> Refreshing...</span></h1>
             <div class="user-info">
+                <button class="btn btn-sm btn-outline-primary" onclick="manualRefresh()" style="margin-right: 15px;" title="Refresh Dashboard">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
                 <div class="user-avatar">A</div>
                 <div>
                     <strong id="userName">Admin</strong><br>
@@ -158,84 +161,246 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/nav.js"></script>
     <script>
-        // Check authentication
         const token = localStorage.getItem('token');
+        let caseStatusChart;
+        let revenueChart;
+
         if (!token) {
             window.location.href = 'login.html';
         }
 
-        // Set user name
         document.getElementById('userName').textContent = localStorage.getItem('userName') || 'Admin';
 
-        // Logout function
         function logout() {
             localStorage.clear();
             window.location.href = 'login.html';
         }
 
-        // Load dashboard stats
+        const formatCurrency = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+
+        const normalizeStatus = (status) => {
+            switch ((status || '').toUpperCase()) {
+                case 'OPEN': return 'Open';
+                case 'IN_PROGRESS': return 'In Progress';
+                case 'CLOSED': return 'Closed';
+                case 'WON': return 'Won';
+                case 'LOST': return 'Lost';
+                case 'SETTLED': return 'Settled';
+                default: return status || 'Unknown';
+            }
+        };
+
+        const escapeHtml = (value) => {
+            const div = document.createElement('div');
+            div.textContent = value ?? '';
+            return div.innerHTML;
+        };
+
+        async function loadDashboard() {
+            await Promise.all([loadDashboardStats(), loadRecentCases()]);
+        }
+
         async function loadDashboardStats() {
             try {
-                const response = await fetch('http://localhost:8080/api/dashboard/admin/stats', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+                const response = await fetch('/api/dashboard/admin/stats', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     }
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const stats = data.data;
-
-                    document.getElementById('totalCases').textContent = stats.totalCases || 0;
-                    document.getElementById('totalAdvocates').textContent = stats.totalAdvocates || 0;
-                    document.getElementById('totalClients').textContent = stats.totalClients || 0;
-                    document.getElementById('pendingHearings').textContent = stats.pendingHearings || 0;
-                    document.getElementById('totalRevenue').textContent = `₹${(stats.totalRevenue || 0).toLocaleString()}`;
-                    document.getElementById('pendingRevenue').textContent = `₹${(stats.pendingRevenue || 0).toLocaleString()}`;
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
                 }
+
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard stats');
+                }
+
+                const payload = await response.json();
+                const stats = payload.data || {};
+
+                document.getElementById('totalCases').textContent = stats.totalCases ?? 0;
+                document.getElementById('totalAdvocates').textContent = stats.totalAdvocates ?? 0;
+                document.getElementById('totalClients').textContent = stats.totalClients ?? 0;
+                document.getElementById('pendingHearings').textContent = stats.pendingHearings ?? 0;
+                document.getElementById('totalRevenue').textContent = formatCurrency(stats.totalRevenue);
+                document.getElementById('pendingRevenue').textContent = formatCurrency(stats.pendingRevenue);
+
+                renderCaseStatusChart(stats.caseStatusDistribution || []);
+                renderRevenueChart(stats.monthlyRevenue || []);
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
         }
 
-        // Initialize charts
-        function initializeCharts() {
-            // Case Status Chart
-            const ctx1 = document.getElementById('caseStatusChart').getContext('2d');
-            new Chart(ctx1, {
+        async function loadRecentCases() {
+            try {
+                const response = await fetch('/api/cases', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to load cases');
+                }
+
+                const cases = await response.json();
+                const tbody = document.getElementById('casesTableBody');
+
+                if (!cases.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No cases found</td></tr>';
+                    return;
+                }
+
+                cases.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                const recent = cases.slice(0, 5);
+
+                tbody.innerHTML = recent.map(c => {
+                    const status = normalizeStatus(c.status);
+                    return `
+                        <tr>
+                            <td>${escapeHtml(c.caseNumber)}</td>
+                            <td>${escapeHtml(c.caseTitle)}</td>
+                            <td>${escapeHtml(c.client?.name || c.client?.user?.name || '—')}</td>
+                            <td>${escapeHtml(c.advocate?.user?.name || '—')}</td>
+                            <td>${escapeHtml(status)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='cases.html'">View</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                document.getElementById('casesTableBody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Unable to load cases</td></tr>';
+            }
+        }
+
+        function renderCaseStatusChart(rows) {
+            const labels = rows.map(r => normalizeStatus(r.status));
+            const data = rows.map(r => Number(r.total || 0));
+            const ctx = document.getElementById('caseStatusChart').getContext('2d');
+
+            if (caseStatusChart) {
+                caseStatusChart.destroy();
+            }
+
+            caseStatusChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Open', 'In Progress', 'Closed', 'Won', 'Lost'],
+                    labels,
                     datasets: [{
-                        data: [12, 19, 15, 8, 3],
-                        backgroundColor: ['#4facfe', '#43e97b', '#fa709a', '#f093fb', '#c4991f']
+                        data,
+                        backgroundColor: ['#4facfe', '#43e97b', '#fa709a', '#f093fb', '#c4991f', '#9fa8da']
                     }]
-                }
-            });
-
-            // Revenue Chart
-            const ctx2 = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Revenue (₹)',
-                        data: [65000, 75000, 82000, 91000, 88000, 95000],
-                        borderColor: '#d4af37',
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                        tension: 0.4
-                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
                 }
             });
         }
 
-        // Load on page load
-        window.onload = function() {
-            loadDashboardStats();
-            initializeCharts();
+        function renderRevenueChart(rows) {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const labels = rows.map(r => `${monthNames[(r.month || 1) - 1]} ${r.year}`);
+            const data = rows.map(r => Number(r.total || 0));
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data,
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                        tension: 0.35,
+                        fill: true
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        async function manualRefresh() {
+            showRefreshIndicator();
+            await loadDashboard();
+            hideRefreshIndicator();
+        }
+
+        function showRefreshIndicator() {
+            const indicator = document.getElementById('refreshIndicator');
+            if (indicator) indicator.style.display = 'inline';
+        }
+
+        function hideRefreshIndicator() {
+            const indicator = document.getElementById('refreshIndicator');
+            if (indicator) {
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        // Auto-refresh every 10 seconds for real-time data
+        let refreshInterval;
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(async () => {
+                showRefreshIndicator();
+                await loadDashboard();
+                hideRefreshIndicator();
+            }, 10000); // 10 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+
+        window.onload = () => {
+            loadDashboard();
+            startAutoRefresh();
         };
+
+        // Stop refresh when page is hidden to save resources
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+            }
+        });
     </script>
 </body>
 </html>

@@ -37,6 +37,9 @@ public class User {
     @Column(length = 20)
     private String phone;
 
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status; // Use DB default (ACTIVE) unless explicitly set

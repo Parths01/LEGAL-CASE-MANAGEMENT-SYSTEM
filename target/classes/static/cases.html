@@ -790,6 +790,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/nav.js"></script>
     <script>
         // Global variables
         let allCases = [];
@@ -799,6 +800,7 @@
         let clients = [];
         let advocates = [];
         const token = localStorage.getItem('token');
+        const userRole = (localStorage.getItem('userRole') || '').toUpperCase();
 
         // Check authentication
         if (!token) {
@@ -817,9 +819,12 @@
         // Load user information
         function loadUserInfo() {
             const userName = localStorage.getItem('userName');
+            const roleLabel = userRole ? userRole.charAt(0) + userRole.slice(1).toLowerCase() : 'User';
             if (userName) {
                 document.getElementById('userName').textContent = userName;
             }
+            const roleEl = document.querySelector('.user-info small');
+            if (roleEl) roleEl.textContent = roleLabel;
         }
 
         // Setup event listeners
@@ -858,6 +863,8 @@
         // Load advocates for dropdown
         async function loadAdvocates() {
             try {
+                const userRole = localStorage.getItem('userRole');
+                const userId = localStorage.getItem('userId');
                 const response = await fetch('/api/advocates', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -868,15 +875,34 @@
                     advocates = await response.json();
                     const advocateSelect = document.getElementById('advocateId');
                     advocateSelect.innerHTML = '<option value="">Select Advocate</option>';
-                    advocates.forEach(advocate => {
-                        const option = document.createElement('option');
-                        option.value = advocate.advocateId;
-                        option.textContent = advocate.user?.name || `Advocate #${advocate.advocateId}`;
-                        advocateSelect.appendChild(option);
-                    });
+                    
+                    // If logged in as ADVOCATE, find and pre-select current advocate
+                    if (userRole === 'ADVOCATE') {
+                        const currentAdvocate = advocates.find(a => a.user && a.user.userId == userId);
+                        if (currentAdvocate) {
+                            const option = document.createElement('option');
+                            option.value = currentAdvocate.advocateId;
+                            option.textContent = currentAdvocate.user?.name || `Advocate #${currentAdvocate.advocateId}`;
+                            option.selected = true;
+                            advocateSelect.appendChild(option);
+                            advocateSelect.disabled = true; // Disable dropdown for advocates
+                        }
+                    } else {
+                        // For ADMIN, show all advocates
+                        advocates.forEach(advocate => {
+                            const option = document.createElement('option');
+                            option.value = advocate.advocateId;
+                            option.textContent = advocate.user?.name || `Advocate #${advocate.advocateId}`;
+                            advocateSelect.appendChild(option);
+                        });
+                    }
                 }
-            } catch (error) {
-                console.error('Error loading advocates:', error);
+                } catch (error) {
+                    console.error('Error loading advocates:', error);
+                } finally {
+                    if (!response || !response.ok) {
+                        console.error('Failed to fetch advocates. Status:', response?.status);
+                    }
             }
         }
 
@@ -1053,6 +1079,14 @@
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-folder-plus"></i> Add New Case';
             document.getElementById('caseForm').reset();
             document.getElementById('caseId').value = '';
+            
+            // Re-enable advocate dropdown if it was disabled (for advocate users)
+            const userRole = localStorage.getItem('userRole');
+            const advocateSelect = document.getElementById('advocateId');
+            if (userRole === 'ADVOCATE' && advocateSelect.disabled) {
+                advocateSelect.disabled = true; // Keep it disabled for advocates
+            }
+            
             document.getElementById('caseModal').style.display = 'block';
         }
 

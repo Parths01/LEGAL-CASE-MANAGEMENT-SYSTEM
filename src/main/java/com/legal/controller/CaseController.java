@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/cases")
@@ -55,10 +57,26 @@ public class CaseController {
     @PreAuthorize("hasAnyRole('ADMIN', 'ADVOCATE')")
     public ResponseEntity<?> createCase(@RequestBody Case caseData) {
         try {
-            // Check if case number already exists
-            if (caseRepository.existsByCaseNumber(caseData.getCaseNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Case number already exists");
+            // Require client with username
+            if (caseData.getClient() == null || caseData.getClient().getUser() == null
+                    || caseData.getClient().getUser().getName() == null
+                    || caseData.getClient().getUser().getName().isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Client username is required to create a case");
+            }
+
+            // Auto-generate a unique case number if missing
+            if (caseData.getCaseNumber() == null || caseData.getCaseNumber().isBlank()) {
+                caseData.setCaseNumber(generateUniqueCaseNumber());
+            } else {
+                if (!caseData.getCaseNumber().matches("\\d{4,5}")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Case number must be 4 to 5 digits");
+                }
+                if (caseRepository.existsByCaseNumber(caseData.getCaseNumber())) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body("Case number already exists");
+                }
             }
 
             Case savedCase = caseRepository.save(caseData);
@@ -67,6 +85,18 @@ public class CaseController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error creating case: " + e.getMessage());
         }
+    }
+
+    private String generateUniqueCaseNumber() {
+        // Numeric 4-5 digit code (e.g., 48215)
+        String candidate;
+        int attempts = 0;
+        do {
+            int rand = ThreadLocalRandom.current().nextInt(1000, 100000); // 4 or 5 digits
+            candidate = String.valueOf(rand);
+            attempts++;
+        } while (caseRepository.existsByCaseNumber(candidate) && attempts < 10);
+        return candidate;
     }
 
     /**
