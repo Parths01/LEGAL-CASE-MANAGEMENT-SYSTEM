@@ -3,215 +3,990 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Legal Case Management System</title>
+    <title>Smart Legal CMS - Professional Legal Case Management</title>
     <link rel="stylesheet" href="assets/css/main.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0b1c2d;
+            --secondary-color: #1a3a52;
+            --accent-color: #2196f3;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-dark); line-height: 1.6; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #ffd700;
+        }
+        .firm-name h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        .firm-name p {
+            font-size: 0.85rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover {
+            color: #ffd700;
+        }
+        .login-btn {
+            background: #ffd700;
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        .login-btn:hover {
+            transform: scale(1.05);
+            color: var(--primary-color) !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(11, 28, 45, 0.95), rgba(26, 58, 82, 0.95)), url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600') center/cover;
+            color: white;
+            padding: 120px 20px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .cta-btn {
+            padding: 15px 35px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .cta-primary {
+            background: #ffd700;
+            color: var(--primary-color);
+        }
+        .cta-primary:hover {
+            background: #ffed4e;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        .cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .cta-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .section-title .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        .bg-light-section {
+            background: var(--bg-light);
+        }
+
+        /* About Us */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .about-text h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        .about-text p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+        .about-image {
+            position: relative;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Practice Areas */
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .practice-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+        .practice-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .practice-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        .practice-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .practice-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Why Choose Us */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .feature-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-color), #42a5f5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+        .feature-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        .feature-box p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .team-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+        }
+        .team-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+        }
+        .team-info {
+            padding: 25px;
+            text-align: center;
+        }
+        .team-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        .team-info .designation {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .team-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+        .stat-box {
+            padding: 30px;
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* Testimonials */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .testimonial-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .quote-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            opacity: 0.3;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .testimonial-text {
+            font-style: italic;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .author-info h5 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        .author-info p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .contact-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .contact-details h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .contact-details p {
+            color: var(--text-light);
+            margin: 0;
+        }
+        .contact-form {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .submit-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background: #1976d2;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 50px 20px 20px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+        .role-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .role-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+        .role-btn:hover {
+            background: var(--accent-color);
+            color: white !important;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .about-content,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .practice-grid,
+            .features-grid,
+            .team-grid,
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Header -->
+    <header class="header">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-balance-scale"></i> Smart Legal Case Management
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-                    <li class="nav-item"><a class="nav-link btn-register" href="register.html">Register</a></li>
-                </ul>
+            <div class="logo-section">
+                <i class="fas fa-balance-scale logo-icon"></i>
+                <div class="firm-name">
+                    <h1>Smart Legal CMS</h1>
+                    <p>Professional Legal Case Management</p>
+                </div>
             </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#practice">Practice Areas</a></li>
+                    <li><a href="#team">Advocates</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="login.html" class="login-btn">Case Management</a></li>
+                </ul>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="hero-title">Smart Legal Case Management System</h1>
-                    <p class="hero-subtitle">Enterprise-Grade Digital Solution for Law Firms, Advocates, and Clients</p>
-                    <p class="hero-description">Streamline your legal operations with our comprehensive case management platform. Manage cases, clients, hearings, documents, and billing all in one place.</p>
-                    <div class="hero-buttons">
-                        <a href="register.html" class="btn btn-primary btn-lg">Get Started</a>
-                        <a href="login.html" class="btn btn-outline-light btn-lg">Login</a>
-                    </div>
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <p class="tagline">Justice Through Excellence</p>
+            <h1>Your Trusted Legal Partner</h1>
+            <p>Delivering comprehensive legal solutions with integrity, expertise, and unwavering commitment to your rights. Experience seamless case management backed by years of legal excellence.</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="cta-btn cta-primary"><i class="fas fa-file-alt"></i> File a Case</a>
+                <a href="#contact" class="cta-btn cta-secondary"><i class="fas fa-calendar-check"></i> Book Consultation</a>
+                <a href="login.html" class="cta-btn cta-secondary"><i class="fas fa-sign-in-alt"></i> Client Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="section">
+        <div class="section-title">
+            <h2>About Our Firm</h2>
+            <p class="subtitle">Building Trust Through Legal Excellence</p>
+        </div>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Leading Legal Practice Since 1995</h3>
+                <p>Smart Legal CMS is a premier law firm dedicated to providing comprehensive legal services across diverse practice areas. With over 25 years of experience, our team of expert advocates has successfully handled thousands of cases, earning the trust of clients nationwide.</p>
+                <p>We combine traditional legal expertise with modern technology to deliver efficient, transparent, and client-focused legal solutions. Our innovative case management system ensures you stay informed at every step of your legal journey.</p>
+                <p>Our commitment to justice, integrity, and client satisfaction has made us one of the most respected legal firms in the region. We don't just represent cases; we fight for your rights with dedication and excellence.</p>
+            </div>
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800" alt="Legal Team">
+            </div>
+        </div>
+    </section>
+
+    <!-- Practice Areas Section -->
+    <section id="practice" class="section bg-light-section">
+        <div class="section-title">
+            <h2>Our Practice Areas</h2>
+            <p class="subtitle">Comprehensive Legal Services Across All Domains</p>
+        </div>
+        <div class="practice-grid">
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-user-tie"></i></div>
+                <h3>Civil Law</h3>
+                <p>Contract disputes, property matters, tort claims, and civil litigation with expert representation and strategic legal counsel.</p>
+            </div>
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-gavel"></i></div>
+                <h3>Criminal Law</h3>
+                <p>Defending your rights in criminal cases with aggressive advocacy and comprehensive legal defense strategies.</p>
+            </div>
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-heart"></i></div>
+                <h3>Family Law</h3>
+                <p>Divorce, child custody, adoption, and family disputes handled with sensitivity, compassion, and legal expertise.</p>
+            </div>
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-building"></i></div>
+                <h3>Corporate Law</h3>
+                <p>Business formation, contracts, mergers, acquisitions, and corporate compliance for businesses of all sizes.</p>
+            </div>
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-home"></i></div>
+                <h3>Property Law</h3>
+                <p>Real estate transactions, property disputes, title verification, and land acquisition legal services.</p>
+            </div>
+            <div class="practice-card">
+                <div class="practice-icon"><i class="fas fa-shopping-cart"></i></div>
+                <h3>Consumer Law</h3>
+                <p>Protecting consumer rights, product liability, fraud cases, and consumer dispute resolution.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section id="why-choose" class="section">
+        <div class="section-title">
+            <h2>Why Choose Us</h2>
+            <p class="subtitle">Your Success is Our Priority</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-award"></i></div>
+                <h4>25+ Years Experience</h4>
+                <p>Decades of proven legal expertise and successful case outcomes across all practice areas.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h4>Complete Confidentiality</h4>
+                <p>Your privacy and case details are protected with the highest standards of legal confidentiality.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-eye"></i></div>
+                <h4>Full Transparency</h4>
+                <p>Clear communication, regular updates, and complete transparency throughout your legal journey.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                <h4>Secure Case Handling</h4>
+                <p>Advanced digital case management system ensuring secure storage and tracking of all case information.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Legal Team Section -->
+    <section id="team" class="section bg-light-section">
+        <div class="section-title">
+            <h2>Our Legal Team</h2>
+            <p class="subtitle">Meet Our Expert Advocates</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-image">
+                    <i class="fas fa-user-tie"></i>
                 </div>
-                <div class="col-lg-6">
-                    <img src="https://img.icons8.com/color/512/justice.png" alt="Legal Tech" class="hero-image">
+                <div class="team-info">
+                    <h4>Adv. Rajesh Kumar</h4>
+                    <p class="designation">Senior Partner - Criminal Law</p>
+                    <p>20+ years experience in criminal litigation with 95% success rate in high-profile cases.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-image">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>Adv. Priya Sharma</h4>
+                    <p class="designation">Partner - Corporate Law</p>
+                    <p>Expert in corporate law, mergers & acquisitions, and business compliance matters.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-image">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>Adv. Amit Patel</h4>
+                    <p class="designation">Senior Advocate - Civil Law</p>
+                    <p>Specialist in civil litigation, property disputes, and contract law with extensive experience.</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-image">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>Adv. Sneha Desai</h4>
+                    <p class="designation">Associate - Family Law</p>
+                    <p>Compassionate advocate specializing in family matters, divorce, and child custody cases.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2>Powerful Features</h2>
-                <p>Everything you need to manage your legal practice efficiently</p>
+    <!-- Client Features Section -->
+    <section id="features" class="section">
+        <div class="section-title">
+            <h2>Client Portal Features</h2>
+            <p class="subtitle">Modern Technology Meets Legal Excellence</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-search"></i></div>
+                <h4>Online Case Tracking</h4>
+                <p>Track your case status, hearing dates, and progress in real-time through our secure portal.</p>
             </div>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-folder-open"></i></div>
-                        <h3>Case Management</h3>
-                        <p>Comprehensive case tracking with status updates, deadlines, and document management</p>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <h4>Document Upload</h4>
+                <p>Securely upload and share documents with your legal team anytime, anywhere.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-bell"></i></div>
+                <h4>Instant Notifications</h4>
+                <p>Receive alerts for hearing dates, case updates, and important legal deadlines.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fas fa-video"></i></div>
+                <h4>Virtual Consultations</h4>
+                <p>Schedule and attend legal consultations from the comfort of your home.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats" class="section bg-light-section">
+        <div class="section-title">
+            <h2>Our Achievements</h2>
+            <p class="subtitle">Numbers That Speak For Themselves</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">Cases Won</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">10,000+</div>
+                <div class="stat-label">Happy Clients</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Expert Advocates</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">25+</div>
+                <div class="stat-label">Years of Excellence</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="section">
+        <div class="section-title">
+            <h2>Client Testimonials</h2>
+            <p class="subtitle">What Our Clients Say About Us</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <i class="fas fa-quote-left quote-icon"></i>
+                <p class="testimonial-text">"Smart Legal CMS handled my property dispute with exceptional professionalism. Their online case tracking system kept me informed throughout the process. Highly recommended!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MK</div>
+                    <div class="author-info">
+                        <h5>Mahesh Kumar</h5>
+                        <p>Business Owner</p>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-users"></i></div>
-                        <h3>Client Portal</h3>
-                        <p>Secure client access to case updates, documents, and invoices</p>
+            </div>
+            <div class="testimonial-card">
+                <i class="fas fa-quote-left quote-icon"></i>
+                <p class="testimonial-text">"The team's expertise in corporate law helped us navigate complex business contracts seamlessly. Their transparency and dedication are truly commendable."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SP</div>
+                    <div class="author-info">
+                        <h5>Sanjay Patel</h5>
+                        <p>CEO, Tech Solutions</p>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-gavel"></i></div>
-                        <h3>Hearing Scheduler</h3>
-                        <p>Never miss a court date with automated reminders and calendar integration</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        <h3>Billing & Invoicing</h3>
-                        <p>Generate professional invoices and track payments effortlessly</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
-                        <h3>Document Management</h3>
-                        <p>Secure cloud storage for all legal documents with version control</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-                        <h3>Analytics & Reports</h3>
-                        <p>Comprehensive insights into case performance and revenue metrics</p>
+            </div>
+            <div class="testimonial-card">
+                <i class="fas fa-quote-left quote-icon"></i>
+                <p class="testimonial-text">"Facing criminal charges was terrifying, but their defense team fought for my rights relentlessly. I'm forever grateful for their support and expertise."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">RG</div>
+                    <div class="author-info">
+                        <h5>Rohit Gupta</h5>
+                        <p>Engineering Professional</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h2>About Our System</h2>
-                    <p>Our Smart Legal Case Management System is designed to digitize and streamline legal operations for law firms of all sizes. Built with enterprise-grade security and scalability in mind.</p>
-                    <ul class="about-features">
-                        <li><i class="fas fa-check-circle"></i> Multi-user role-based access control</li>
-                        <li><i class="fas fa-check-circle"></i> Secure JWT authentication</li>
-                        <li><i class="fas fa-check-circle"></i> Real-time case status updates</li>
-                        <li><i class="fas fa-check-circle"></i> Automated hearing reminders</li>
-                        <li><i class="fas fa-check-circle"></i> Legal notice generation</li>
-                        <li><i class="fas fa-check-circle"></i> Comprehensive audit logs</li>
-                    </ul>
-                </div>
-                <div class="col-lg-6">
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <h3>99.9%</h3>
-                            <p>Uptime</p>
-                        </div>
-                        <div class="stat-box">
-                            <h3>256-bit</h3>
-                            <p>Encryption</p>
-                        </div>
-                        <div class="stat-box">
-                            <h3>24/7</h3>
-                            <p>Support</p>
-                        </div>
-                        <div class="stat-box">
-                            <h3>100%</h3>
-                            <p>Secure</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Contact Section -->
+    <section id="contact" class="section bg-light-section">
+        <div class="section-title">
+            <h2>Contact Us</h2>
+            <p class="subtitle">Get In Touch For Legal Consultation</p>
         </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2>What Our Clients Say</h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="contact-details">
+                        <h4>Our Office</h4>
+                        <p>Smart Legal Complex, 3rd Floor<br>
+                        Law Garden, Ellisbridge<br>
+                        Ahmedabad, Gujarat - 380006, India</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <div class="contact-details">
+                        <h4>Phone</h4>
+                        <p>+91 79 2656 7890<br>
+                        +91 98250 12345<br>
+                        (Mon - Sat: 9:00 AM - 6:00 PM)</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="contact-details">
+                        <h4>Email</h4>
+                        <p>info@smartlegalcms.com<br>
+                        cases@smartlegalcms.com<br>
+                        support@smartlegalcms.com</p>
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <p>"This system has transformed how we manage our cases. Everything is organized and accessible."</p>
-                        <div class="testimonial-author">
-                            <strong>Advocate Kumar</strong>
-                            <span>Senior Partner, Kumar & Associates</span>
-                        </div>
+            <div class="contact-form">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Send Us a Message</h3>
+                <form>
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" required placeholder="Enter your full name">
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <p>"The client portal is fantastic! My clients love being able to track their cases in real-time."</p>
-                        <div class="testimonial-author">
-                            <strong>Adv. Priya Sharma</strong>
-                            <span>Managing Partner, Legal Solutions</span>
-                        </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" required placeholder="Enter your email">
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <p>"Billing and invoicing has never been easier. The automated reports save us hours every week."</p>
-                        <div class="testimonial-author">
-                            <strong>Rajesh Gupta</strong>
-                            <span>Founder, Gupta Law Firm</span>
-                        </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="Enter your phone number">
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label>Case Type</label>
+                        <input type="text" placeholder="e.g., Civil, Criminal, Family">
+                    </div>
+                    <div class="form-group">
+                        <label>Message *</label>
+                        <textarea required placeholder="Briefly describe your legal matter..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
+                </form>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h4><i class="fas fa-balance-scale"></i> Smart Legal CMS</h4>
-                    <p>Enterprise-grade legal case management solution for modern law firms.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="footer-links">
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Contact</h5>
-                    <p><i class="fas fa-envelope"></i> info@legalcms.com</p>
-                    <p><i class="fas fa-phone"></i> +91 9876543210</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Delhi, India</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-balance-scale"></i> Smart Legal CMS</h3>
+                <p>Your trusted partner in legal excellence. Delivering justice with integrity, expertise, and unwavering commitment since 1995.</p>
+                <div style="margin-top: 20px;">
+                    <p><strong>Follow Us:</strong></p>
+                    <div style="display: flex; gap: 15px; font-size: 1.5rem; margin-top: 10px;">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
             </div>
-            <hr>
-            <div class="text-center">
-                <p>&copy; 2026 Smart Legal Case Management System. All rights reserved.</p>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#practice">Practice Areas</a></li>
+                    <li><a href="#team">Our Advocates</a></li>
+                    <li><a href="#features">Client Portal</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
             </div>
+            <div class="footer-section">
+                <h3>Practice Areas</h3>
+                <ul>
+                    <li><a href="#">Civil Law</a></li>
+                    <li><a href="#">Criminal Law</a></li>
+                    <li><a href="#">Family Law</a></li>
+                    <li><a href="#">Corporate Law</a></li>
+                    <li><a href="#">Property Law</a></li>
+                    <li><a href="#">Consumer Law</a></li>
+                    <li><a href="#">Tax Law</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Role-Based Access</h3>
+                <p style="margin-bottom: 15px;">Login to your account based on your role:</p>
+                <div class="role-login">
+                    <a href="login.html" class="role-btn"><i class="fas fa-user-shield"></i> Admin Login</a>
+                    <a href="login.html" class="role-btn"><i class="fas fa-user-tie"></i> Advocate Login</a>
+                    <a href="login.html" class="role-btn"><i class="fas fa-users"></i> Client Login</a>
+                    <a href="login.html" class="role-btn"><i class="fas fa-user"></i> Clerk Login</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Smart Legal CMS. All Rights Reserved. | Designed with <i class="fas fa-heart" style="color: #ff6b6b;"></i> for Justice</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form submission
+        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for contacting us! We will get back to you within 24 hours.');
+            this.reset();
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.practice-card, .feature-box, .team-card, .testimonial-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>

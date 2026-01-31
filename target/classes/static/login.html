@@ -38,15 +38,6 @@
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
 
-                <div class="text-center">
-                    <a href="forgot-password.html" class="text-muted">Forgot Password?</a>
-                </div>
-
-                <hr>
-
-                <div class="text-center">
-                    <p>Don't have an account? <a href="register.html">Register here</a></p>
-                </div>
             </form>
 
             <div id="alertBox" class="alert alert-danger mt-3" style="display: none;"></div>
@@ -54,7 +45,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/auth.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -80,21 +70,7 @@
                     localStorage.setItem('userRole', data.role);
                     localStorage.setItem('userName', data.name);
                     localStorage.setItem('userEmail', data.email);
-
-                    // Redirect based on role
-                    switch(data.role) {
-                        case 'ADMIN':
-                            window.location.href = 'admin-dashboard.html';
-                            break;
-                        case 'ADVOCATE':
-                            window.location.href = 'advocate-dashboard.html';
-                            break;
-                        case 'CLIENT':
-                            window.location.href = 'client-dashboard.html';
-                            break;
-                        default:
-                            window.location.href = 'dashboard.html';
-                    }
+                    showAlert('Login successful');
                 } else {
                     showAlert(data.message || 'Login failed');
                 }
