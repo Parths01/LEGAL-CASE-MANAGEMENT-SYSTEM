@@ -51,9 +51,14 @@
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const loginBtn = document.querySelector('button[type="submit"]');
+            
+            // Disable button during submission
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
             try {
-                const response = await fetch('http://localhost:8080/api/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -62,30 +67,67 @@
                 });
 
                 const data = await response.json();
+                console.log('Login response:', data);
 
-                if (response.ok) {
+                if (response.ok && data.token) {
                     // Store token and user info
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
                     localStorage.setItem('userRole', data.role);
                     localStorage.setItem('userName', data.name);
                     localStorage.setItem('userEmail', data.email);
-                    showAlert('Login successful');
+                    
+                    console.log('Redirecting user with role:', data.role);
+                    
+                    // Redirect based on role
+                    redirectUserByRole(data.role);
                 } else {
-                    showAlert(data.message || 'Login failed');
+                    showAlert(data.message || 'Login failed. Please check your credentials.');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 showAlert('Connection error. Please try again.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
             }
         });
 
+        function redirectUserByRole(role) {
+            console.log('Redirecting to dashboard for role:', role);
+            const roleUpper = String(role).toUpperCase().trim();
+            
+            let dashboard = 'index.html';
+            switch(roleUpper) {
+                case 'ADMIN':
+                    dashboard = 'admin-dashboard.html';
+                    break;
+                case 'ADVOCATE':
+                    dashboard = 'advocate-dashboard.html';
+                    break;
+                case 'CLIENT':
+                    dashboard = 'client-dashboard.html';
+                    break;
+                case 'CLERK':
+                    dashboard = 'clerk-dashboard.html';
+                    break;
+            }
+            
+            console.log('Redirecting to:', dashboard);
+            console.log('Full URL:', window.location.origin + '/' + dashboard);
+            setTimeout(() => {
+                window.location.href = dashboard;
+            }, 300);
+        }
+
         function showAlert(message) {
             const alertBox = document.getElementById('alertBox');
+            alertBox.classList.remove('alert-success');
+            alertBox.classList.add('alert-danger');
             alertBox.textContent = message;
             alertBox.style.display = 'block';
-            setTimeout(() => {
-                alertBox.style.display = 'none';
-            }, 5000);
+            window.scrollTo(0, 0);
         }
     </script>
 </body>

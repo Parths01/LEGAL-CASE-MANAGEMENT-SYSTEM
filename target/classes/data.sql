@@ -1,0 +1,3 @@
+-- Data initialization skipped - using manually added database data
+-- All data has been added manually by user via database
+-- This prevents conflicts when application restarts

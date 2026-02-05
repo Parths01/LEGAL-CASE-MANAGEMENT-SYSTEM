@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - Smart Legal CMS</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0b1c2d;
+            --secondary-color: #1a3a52;
+            --accent-color: #2196f3;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #f8f9fa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-dark); line-height: 1.6; }
+        .dashboard-container { display: flex; flex-direction: column; min-height: 100vh; }
+        .main-content { flex: 1; padding: 40px 20px 60px; background: var(--bg-light); max-width: 1200px; margin: 0 auto; width: 100%; }
+        .role-badge { background: var(--accent-color); color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .d-flex { display: flex; }
+        .justify-content-between { justify-content: space-between; }
+        .align-items-center { align-items: center; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-4 { margin-top: 2rem; }
+        .ms-3 { margin-left: 1rem; }
+        .w-100 { width: 100%; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 15px; }
+        .section-title h4 { margin: 0; color: var(--primary-color); font-size: 1.2rem; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.03); }
+        .card:hover { transform: translateY(-4px); transition: transform 0.2s ease; }
+        .kpi { display: flex; justify-content: space-between; align-items: center; }
+        .kpi .value { font-size: 1.8rem; font-weight: 700; color: var(--primary-color); }
+        .kpi .label { color: var(--text-light); font-size: 0.9rem; }
+        .kpi .trend { font-size: 0.85rem; color: #16a34a; }
+        .kpi .icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(33, 150, 243, 0.12); color: var(--accent-color); font-size: 1.2rem; }
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .list { list-style: none; padding: 0; margin: 0; }
+        .list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .list li:last-child { border-bottom: none; }
+        .status { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.warn { background: #fef3c7; color: #92400e; }
+        .status.info { background: #dbeafe; color: #1e40af; }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .action { display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px dashed #cbd5e1; border-radius: 12px; background: #fff; }
+        .action .icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(11, 28, 45, 0.08); color: var(--primary-color); }
+        .table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        .table th, .table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #eee; }
+        .table th { color: var(--text-light); font-weight: 600; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover { background: #1976d2; }
+        .btn-outline { background: transparent; color: var(--primary-color); border: 1px solid #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
+        h1 { color: var(--primary-color); font-size: 2.3rem; margin-bottom: 8px; }
+        .text-muted { color: var(--text-light); }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #ffd700;
+        }
+        .firm-name h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        .firm-name p {
+            font-size: 0.85rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover {
+            color: #ffd700;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            transform: scale(1.05);
+            background: #c82333;
+        }
+        
+        @media (max-width: 768px) { .row { grid-template-columns: 1fr; } h1 { font-size: 1.8rem; } .nav-menu { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <i class="fas fa-balance-scale logo-icon"></i>
+                <div class="firm-name">
+                    <h1>Smart Legal CMS</h1>
+                    <p>Client Dashboard</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-briefcase"></i> My Cases</a></li>
+                    <li><a href="#"><i class="fas fa-file-alt"></i> Documents</a></li>
+                    <li><a href="#"><i class="fas fa-comments"></i> Messages</a></li>
+                    <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>Client Dashboard</h1>
+                    <p class="text-muted">Track your cases, documents, and messages in one place.</p>
+                </div>
+                <span class="role-badge">CLIENT</span>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">My Cases</div>
+                            <div class="value" id="clientTotalCasesValue">0</div>
+                            <div class="trend" id="clientTotalCasesTrend">Updated just now</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-briefcase"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Active Cases</div>
+                            <div class="value" id="clientActiveCasesValue">0</div>
+                            <div class="trend" id="clientActiveCasesTrend">Updated just now</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-calendar"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Documents</div>
+                            <div class="value" id="clientDocumentsValue">0</div>
+                            <div class="trend" id="clientDocumentsTrend">Updated just now</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-file-alt"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Pending Invoices</div>
+                            <div class="value" id="clientPendingInvoicesValue">0</div>
+                            <div class="trend" id="clientPendingInvoicesTrend">Updated just now</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-rupee-sign"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h4>Quick Actions</h4>
+                <button class="btn btn-outline">View all</button>
+            </div>
+            <div class="action-grid">
+                <div class="action">
+                    <div class="icon"><i class="fas fa-comment"></i></div>
+                    <div>
+                        <div><strong>Message Advocate</strong></div>
+                        <div class="text-muted">Ask a question or share updates</div>
+                    </div>
+                </div>
+                <div class="action">
+                    <div class="icon"><i class="fas fa-upload"></i></div>
+                    <div>
+                        <div><strong>Upload Document</strong></div>
+                        <div class="text-muted">Submit documents securely</div>
+                    </div>
+                </div>
+                <div class="action">
+                    <div class="icon"><i class="fas fa-receipt"></i></div>
+                    <div>
+                        <div><strong>Pay Invoice</strong></div>
+                        <div class="text-muted">View and settle dues</div>
+                    </div>
+                </div>
+                <div class="action">
+                    <div class="icon"><i class="fas fa-bell"></i></div>
+                    <div>
+                        <div><strong>Notifications</strong></div>
+                        <div class="text-muted">Check recent updates</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h4>My Case Overview</h4>
+                <button class="btn btn-primary">Download</button>
+            </div>
+            <div class="content-grid">
+                <div class="card">
+                    <h4>Recent Case Updates</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Update</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientUpdatesBody">
+                            <tr><td colspan="2" class="text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4>Reminders</h4>
+                    <ul class="list" id="clientRemindersList">
+                        <li><span>Loading...</span><span class="status info">...</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is authenticated and has CLIENT role
+        function checkAuthorization() {
+            const userRole = localStorage.getItem('userRole');
+            const userName = localStorage.getItem('userName');
+            
+            if (!userRole) {
+                window.location.href = '/login.html';
+                return false;
+            }
+            
+            if (userRole.trim() !== 'CLIENT') {
+                alert('Unauthorized access. You do not have permission to access this page.');
+                window.location.href = '/login.html';
+                return false;
+            }
+            
+            if (userName) {
+                const userDisplay = document.getElementById('userDisplay');
+                if (userDisplay) {
+                    userDisplay.textContent = userName;
+                }
+            }
+            
+            return true;
+        }
+        
+        async function loadClientDashboard() {
+            try {
+                const response = await fetch('/api/dashboard/client/summary');
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                setText('clientTotalCasesValue', data.totalCases ?? 0);
+                setText('clientActiveCasesValue', data.activeCases ?? 0);
+                setText('clientDocumentsValue', data.documentsCount ?? 0);
+                setText('clientPendingInvoicesValue', data.pendingInvoices ?? 0);
+                renderUpdates('clientUpdatesBody', data.updates || []);
+                renderItems('clientRemindersList', data.reminders || []);
+            } catch (e) {
+                // no-op
+            }
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+            }
+        }
+
+        function renderUpdates(bodyId, items) {
+            const tbody = document.getElementById(bodyId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-muted">No updates</td></tr>';
+                return;
+            }
+            items.forEach(item => {
+                const status = item.status || 'info';
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${escapeHtml(item.label || '')}</td><td><span class="status ${status}">${statusLabel(status)}</span></td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderItems(listId, items) {
+            const list = document.getElementById(listId);
+            if (!list) return;
+            list.innerHTML = '';
+            if (items.length === 0) {
+                list.innerHTML = '<li><span>No reminders</span><span class="status info">-</span></li>';
+                return;
+            }
+            items.forEach(item => {
+                const status = item.status || 'info';
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${escapeHtml(item.label || '')}</span><span class="status ${status}">${statusLabel(status)}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        function statusLabel(status) {
+            switch (status) {
+                case 'success':
+                    return 'OK';
+                case 'warn':
+                    return 'Attention';
+                case 'info':
+                default:
+                    return 'Info';
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        window.addEventListener('load', () => {
+            if (checkAuthorization()) {
+                loadClientDashboard();
+            }
+        });
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                checkAuthorization();
+                loadClientDashboard();
+            }
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
