@@ -20,8 +20,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index.html").permitAll()
                 // Allow public access to dashboard pages (role check done on frontend)
                 .requestMatchers("/admin-dashboard.html", "/advocate-dashboard.html", "/client-dashboard.html", "/clerk-dashboard.html").permitAll()
-                // Allow public access to user management page
-                .requestMatchers("/user-management.html").permitAll()
+                // Allow public access to user management and cases pages
+                .requestMatchers("/user-management.html", "/cases.html", "/case-details.html", "/clerk-cases.html", "/advocate-cases.html").permitAll()
                 // Allow public access to static resources
                 .requestMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll()
                 // Allow public access to login page

@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Details - Smart Legal CMS</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0b1c2d;
+            --secondary-color: #1a3a52;
+            --accent-color: #2196f3;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #f8f9fa;
+            --success-color: #16a34a;
+            --danger-color: #dc3545;
+            --warning-color: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-dark); background: var(--bg-light); }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { font-size: 2.5rem; color: #ffd700; }
+        .firm-name h1 { font-size: 1.5rem; margin: 0; font-weight: 700; }
+        .firm-name p { font-size: 0.85rem; margin: 0; opacity: 0.9; }
+        .nav-menu { display: flex; gap: 25px; list-style: none; align-items: center; }
+        .nav-menu a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav-menu a:hover { color: #ffd700; }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .logout-btn:hover { transform: scale(1.05); background: #c82333; }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .breadcrumb a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        .page-header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin: 0 0 8px;
+        }
+        .case-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover { background: #1976d2; }
+        .btn-outline { background: transparent; color: var(--primary-color); border: 1px solid #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+        .status-badge, .priority-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-closed { background: #e5e7eb; color: #374151; }
+        .status-escalated { background: #fee2e2; color: #991b1b; }
+        .priority-high { background: #fee2e2; color: #991b1b; }
+        .priority-medium { background: #fef3c7; color: #92400e; }
+        .priority-low { background: #dbeafe; color: #1e40af; }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .card h3 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h3 i {
+            color: var(--accent-color);
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.92rem;
+        }
+        .info-value {
+            color: var(--text-dark);
+        }
+
+        .timeline {
+            position: relative;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 25px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e5e7eb;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+        .timeline-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .list-item-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .list-item-meta {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+        .document-info {
+            flex: 1;
+        }
+        .document-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.92rem;
+        }
+        .document-size {
+            font-size: 0.82rem;
+            color: var(--text-light);
+        }
+
+        .task-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        .task-content {
+            flex: 1;
+        }
+        .task-title {
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .task-due {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        .task-overdue {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .note-item {
+            background: #fffbeb;
+            border-left: 3px solid #fbbf24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .note-author {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+        .note-date {
+            font-size: 0.82rem;
+            color: var(--text-light);
+        }
+        .note-text {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            min-width: 300px;
+        }
+        .toast.success { border-left: 4px solid var(--success-color); }
+        .toast.info { border-left: 4px solid #2563eb; }
+        .toast.error { border-left: 4px solid var(--danger-color); }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            margin: 0 0 16px;
+            color: var(--primary-color);
+        }
+        .modal textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+            font-size: 0.92rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-menu { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <i class="fas fa-balance-scale logo-icon"></i>
+                <div class="firm-name">
+                    <h1>Smart Legal CMS</h1>
+                    <p>Case Details</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="user-management.html"><i class="fas fa-users"></i> Users</a></li>
+                    <li><a href="cases.html"><i class="fas fa-gavel"></i> Cases</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><span id="userDisplay" style="margin-right: 15px;"></span></li>
+                    <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="breadcrumb">
+            <a href="cases.html"><i class="fas fa-arrow-left"></i> Back to Cases</a>
+        </div>
+
+        <div class="page-header">
+            <div>
+                <h1 id="caseTitle">Loading...</h1>
+                <div class="case-meta">
+                    <span id="caseId" style="color: var(--text-light);"></span>
+                    <span id="statusBadge"></span>
+                    <span id="priorityBadge"></span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline" onclick="printCase()"><i class="fas fa-print"></i> Print</button>
+                <button class="btn btn-primary" id="editCaseBtn" style="display: none;" onclick="openEditCaseModal()"><i class="fas fa-pen"></i> Edit Case</button>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div>
+                <!-- Case Overview -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-info-circle"></i> Case Overview</h3>
+                    <div class="info-row">
+                        <div class="info-label">Case Category:</div>
+                        <div class="info-value" id="caseCategory"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Filing Date:</div>
+                        <div class="info-value" id="filingDate"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Court:</div>
+                        <div class="info-value" id="court"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Judge:</div>
+                        <div class="info-value" id="judge"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Description:</div>
+                        <div class="info-value" id="description"></div>
+                    </div>
+                </div>
+
+                <!-- Parties Involved -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-users"></i> Parties Involved</h3>
+                    <div class="info-row">
+                        <div class="info-label">Client:</div>
+                        <div class="info-value" id="client"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Advocate:</div>
+                        <div class="info-value" id="advocate"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Opposing Party:</div>
+                        <div class="info-value" id="opposingParty"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Opposing Counsel:</div>
+                        <div class="info-value" id="opposingCounsel"></div>
+                    </div>
+                </div>
+
+                <!-- Case Timeline -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-timeline"></i> Case Timeline</h3>
+                    <div class="timeline" id="timeline"></div>
+                </div>
+
+                <!-- Documents -->
+                <div class="card">
+                    <h3><i class="fas fa-file-alt"></i> Documents</h3>
+                    <div id="documentsList"></div>
+                </div>
+            </div>
+
+            <div>
+                <!-- Upcoming Hearings -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-calendar-alt"></i> Upcoming Hearings</h3>
+                    <div id="hearingsList"></div>
+                </div>
+
+                <!-- Tasks & Deadlines -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-tasks"></i> Tasks & Deadlines</h3>
+                    <div id="tasksList"></div>
+                </div>
+
+                <!-- Case Notes -->
+                <div class="card">
+                    <h3><i class="fas fa-sticky-note"></i> Case Notes</h3>
+                    <button class="btn btn-sm btn-outline" onclick="addNote()" style="margin-bottom: 15px;">
+                        <i class="fas fa-plus"></i> Add Note
+                    </button>
+                    <div id="notesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample case data - in real app, fetch from API
+        const casesData = {
+            "LC-2026-001": {
+                id: "LC-2026-001",
+                title: "Rao vs. Mehta",
+                status: "Active",
+                priority: "High",
+                category: "Civil",
+                filingDate: "2025-08-15",
+                court: "District Court, Mumbai",
+                judge: "Hon'ble Justice R.K. Sharma",
+                description: "Property dispute regarding ownership of commercial building in Bandra West. Client claims rightful ownership based on purchase deed dated 2020.",
+                client: "Ananya Rao",
+                advocate: "Adv. S. Verma",
+                opposingParty: "Rajesh Mehta",
+                opposingCounsel: "Adv. K. Desai",
+                timeline: [
+                    { date: "2025-08-15", title: "Case Filed", desc: "Initial petition filed in District Court" },
+                    { date: "2025-09-10", title: "First Hearing", desc: "Preliminary hearing scheduled" },
+                    { date: "2025-10-05", title: "Evidence Submitted", desc: "Property documents and purchase deeds submitted" },
+                    { date: "2025-12-20", title: "Cross-Examination", desc: "Witness cross-examination conducted" },
+                    { date: "2026-01-18", title: "Arguments Heard", desc: "Final arguments presented by both parties" }
+                ],
+                hearings: [
+                    { date: "2026-02-12", time: "11:00 AM", purpose: "Final Arguments Continuation", location: "Court Room 3" },
+                    { date: "2026-03-05", time: "10:30 AM", purpose: "Judgment Hearing", location: "Court Room 3" }
+                ],
+                documents: [
+                    { name: "Property Purchase Deed 2020.pdf", size: "2.4 MB", type: "pdf" },
+                    { name: "Land Survey Report.pdf", size: "1.8 MB", type: "pdf" },
+                    { name: "Witness Statement - A. Rao.docx", size: "245 KB", type: "doc" },
+                    { name: "Evidence Photos.zip", size: "12.3 MB", type: "zip" }
+                ],
+                tasks: [
+                    { title: "Prepare closing arguments", due: "2026-02-10", completed: false, overdue: false },
+                    { title: "Submit additional evidence", due: "2026-02-08", completed: false, overdue: true },
+                    { title: "Client meeting - strategy discussion", due: "2026-02-15", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. S. Verma", date: "2026-02-01", text: "Client confident about property ownership. Need to emphasize timeline of events in final arguments." },
+                    { author: "Admin", date: "2026-01-28", text: "Reminder: Court filing fee payment pending for next hearing." }
+                ]
+            },
+            "LC-2026-002": {
+                id: "LC-2026-002",
+                title: "State vs. Iqbal",
+                status: "Pending",
+                priority: "High",
+                category: "Criminal",
+                filingDate: "2025-11-20",
+                court: "Sessions Court, Mumbai",
+                judge: "Hon'ble Justice P.M. Desai",
+                description: "Criminal case involving charges under IPC sections 420 (cheating) and 120B (criminal conspiracy). State prosecution against defendant for alleged financial fraud.",
+                client: "Govt. of Maharashtra",
+                advocate: "Adv. K. Singh",
+                opposingParty: "Mohammed Iqbal",
+                opposingCounsel: "Adv. R. Khan",
+                timeline: [
+                    { date: "2025-11-20", title: "FIR Filed", desc: "First Information Report registered" },
+                    { date: "2025-12-05", title: "Charge Sheet Filed", desc: "Formal charges filed by prosecution" },
+                    { date: "2026-01-10", title: "Bail Hearing", desc: "Bail application rejected" }
+                ],
+                hearings: [
+                    { date: "2026-02-18", time: "02:00 PM", purpose: "Witness Examination", location: "Court Room 7" }
+                ],
+                documents: [
+                    { name: "FIR Copy.pdf", size: "890 KB", type: "pdf" },
+                    { name: "Charge Sheet.pdf", size: "3.2 MB", type: "pdf" },
+                    { name: "Bank Statements.pdf", size: "4.5 MB", type: "pdf" }
+                ],
+                tasks: [
+                    { title: "Review witness testimonies", due: "2026-02-15", completed: false, overdue: false },
+                    { title: "Prepare cross-examination questions", due: "2026-02-17", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. K. Singh", date: "2026-01-30", text: "Strong documentary evidence available. Focus on financial transactions timeline." }
+                ]
+            },
+            "LC-2026-003": {
+                id: "LC-2026-003",
+                title: "Skyline Builders Contract",
+                status: "Active",
+                priority: "Medium",
+                category: "Corporate",
+                filingDate: "2025-09-10",
+                court: "Bombay High Court",
+                judge: "Hon'ble Justice A.N. Kulkarni",
+                description: "Corporate dispute regarding breach of contract. Client alleges that Skyline Builders failed to meet contractual obligations in infrastructure project worth ₹50 crores.",
+                client: "Skyline Builders",
+                advocate: "Adv. A. Patel",
+                opposingParty: "Global Infrastructure Ltd.",
+                opposingCounsel: "Adv. M. Chaturvedi",
+                timeline: [
+                    { date: "2025-09-10", title: "Case Filed", desc: "Contract breach petition filed" },
+                    { date: "2025-10-20", title: "Contract Review", desc: "Contract documents reviewed in court" },
+                    { date: "2025-12-15", title: "Expert Testimony", desc: "Engineering expert witness testimony" }
+                ],
+                hearings: [
+                    { date: "2026-03-03", time: "10:00 AM", purpose: "Contract Interpretation Hearing", location: "Court Room 12" }
+                ],
+                documents: [
+                    { name: "Original Contract Agreement.pdf", size: "5.2 MB", type: "pdf" },
+                    { name: "Project Timeline.xlsx", size: "1.1 MB", type: "doc" },
+                    { name: "Expert Engineer Report.pdf", size: "3.8 MB", type: "pdf" }
+                ],
+                tasks: [
+                    { title: "Review contract clauses", due: "2026-02-25", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. A. Patel", date: "2026-02-02", text: "Contract clearly indicates delivery deadlines. Strong case for damages." }
+                ]
+            },
+            "LC-2026-004": {
+                id: "LC-2026-004",
+                title: "Nair Divorce Settlement",
+                status: "Escalated",
+                priority: "High",
+                category: "Family",
+                filingDate: "2025-07-05",
+                court: "Family Court, Mumbai",
+                judge: "Hon'ble Justice S. Iyer",
+                description: "Contested divorce case with disputes over child custody and property division. Multiple hearings regarding alimony and visitation rights.",
+                client: "Riya Nair",
+                advocate: "Adv. M. Joseph",
+                opposingParty: "Kiran Nair",
+                opposingCounsel: "Adv. P. Menon",
+                timeline: [
+                    { date: "2025-07-05", title: "Divorce Petition Filed", desc: "Initial petition for divorce filed" },
+                    { date: "2025-08-20", title: "Custody Hearing", desc: "First custody hearing conducted" },
+                    { date: "2025-10-15", title: "Property Valuation", desc: "Joint property valuation completed" },
+                    { date: "2025-12-10", title: "Mediation Attempt", desc: "Court-ordered mediation failed" },
+                    { date: "2026-01-20", title: "Case Escalated", desc: "Case escalated due to non-compliance" }
+                ],
+                hearings: [
+                    { date: "2026-02-10", time: "11:30 AM", purpose: "Custody & Alimony Hearing", location: "Family Court 2" },
+                    { date: "2026-02-25", time: "10:00 AM", purpose: "Property Division Hearing", location: "Family Court 2" }
+                ],
+                documents: [
+                    { name: "Divorce Petition.pdf", size: "1.5 MB", type: "pdf" },
+                    { name: "Property Valuation Report.pdf", size: "2.2 MB", type: "pdf" },
+                    { name: "Child Custody Evaluation.pdf", size: "1.8 MB", type: "pdf" },
+                    { name: "Income Tax Returns.pdf", size: "980 KB", type: "pdf" }
+                ],
+                tasks: [
+                    { title: "Submit custody affidavit", due: "2026-02-08", completed: false, overdue: true },
+                    { title: "Finalize settlement proposal", due: "2026-02-09", completed: false, overdue: true },
+                    { title: "Client counseling session", due: "2026-02-11", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. M. Joseph", date: "2026-02-03", text: "Client emotional. Need to focus on best interests of child. Property division may require arbitration." },
+                    { author: "Admin", date: "2026-02-04", text: "URGENT: Multiple deadlines approaching. Client needs to be informed." }
+                ]
+            },
+            "LC-2026-005": {
+                id: "LC-2026-005",
+                title: "Verma Property Dispute",
+                status: "Active",
+                priority: "Medium",
+                category: "Property",
+                filingDate: "2025-10-01",
+                court: "Civil Court, Thane",
+                judge: "Hon'ble Justice T. Raghavan",
+                description: "Property boundary dispute between neighboring landowners. Client claims encroachment of 200 sq ft by adjacent property owner.",
+                client: "Arjun Verma",
+                advocate: "Adv. T. Roy",
+                opposingParty: "Suresh Kumar",
+                opposingCounsel: "Adv. N. Gupta",
+                timeline: [
+                    { date: "2025-10-01", title: "Case Filed", desc: "Encroachment petition filed" },
+                    { date: "2025-11-05", title: "Site Survey Ordered", desc: "Court ordered independent survey" },
+                    { date: "2025-12-20", title: "Survey Report Submitted", desc: "Survey confirms encroachment" }
+                ],
+                hearings: [
+                    { date: "2026-02-22", time: "02:30 PM", purpose: "Final Arguments", location: "Court Room 5" }
+                ],
+                documents: [
+                    { name: "Original Property Deed.pdf", size: "1.2 MB", type: "pdf" },
+                    { name: "Survey Report 2025.pdf", size: "3.5 MB", type: "pdf" },
+                    { name: "Photographs - Encroachment.zip", size: "8.7 MB", type: "zip" }
+                ],
+                tasks: [
+                    { title: "Review survey measurements", due: "2026-02-20", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. T. Roy", date: "2026-01-25", text: "Survey report strongly supports our case. Focus on evidence presentation." }
+                ]
+            },
+            "LC-2026-006": {
+                id: "LC-2026-006",
+                title: "GreenTech Compliance",
+                status: "Pending",
+                priority: "Low",
+                category: "Corporate",
+                filingDate: "2025-12-01",
+                court: "Bombay High Court",
+                judge: "Hon'ble Justice V. Deshmukh",
+                description: "Corporate compliance case regarding environmental regulations. Client seeking clarity on new pollution control norms.",
+                client: "GreenTech Ltd.",
+                advocate: "Adv. P. Desai",
+                opposingParty: "Maharashtra Pollution Control Board",
+                opposingCounsel: "Govt. Legal Counsel",
+                timeline: [
+                    { date: "2025-12-01", title: "Writ Petition Filed", desc: "Petition for regulatory clarification" },
+                    { date: "2026-01-15", title: "Notice Issued", desc: "Notice to pollution board issued" }
+                ],
+                hearings: [
+                    { date: "2026-03-12", time: "11:00 AM", purpose: "Preliminary Hearing", location: "Court Room 18" }
+                ],
+                documents: [
+                    { name: "Writ Petition.pdf", size: "2.1 MB", type: "pdf" },
+                    { name: "Compliance Report 2025.pdf", size: "4.3 MB", type: "pdf" }
+                ],
+                tasks: [
+                    { title: "Gather compliance documentation", due: "2026-03-05", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. P. Desai", date: "2026-01-20", text: "Regulatory ambiguity in client's favor. Should be resolved quickly." }
+                ]
+            },
+            "LC-2026-007": {
+                id: "LC-2026-007",
+                title: "Singh Inheritance Case",
+                status: "Closed",
+                priority: "Low",
+                category: "Family",
+                filingDate: "2025-05-10",
+                court: "Civil Court, Mumbai",
+                judge: "Hon'ble Justice R. Pillai",
+                description: "Inheritance dispute regarding distribution of ancestral property. Case resolved through mediation and mutual settlement.",
+                client: "Raj Singh",
+                advocate: "Adv. L. Bose",
+                opposingParty: "Vijay Singh",
+                opposingCounsel: "Adv. S. Malhotra",
+                timeline: [
+                    { date: "2025-05-10", title: "Case Filed", desc: "Inheritance dispute petition filed" },
+                    { date: "2025-06-20", title: "Property Assessment", desc: "Property valuation completed" },
+                    { date: "2025-08-15", title: "Mediation", desc: "Successful mediation conducted" },
+                    { date: "2025-09-10", title: "Settlement Agreement", desc: "Settlement agreement signed" },
+                    { date: "2026-01-15", title: "Case Closed", desc: "Final decree issued" }
+                ],
+                hearings: [],
+                documents: [
+                    { name: "Inheritance Petition.pdf", size: "1.8 MB", type: "pdf" },
+                    { name: "Property Valuation.pdf", size: "2.5 MB", type: "pdf" },
+                    { name: "Settlement Agreement.pdf", size: "890 KB", type: "pdf" },
+                    { name: "Final Decree.pdf", size: "650 KB", type: "pdf" }
+                ],
+                tasks: [],
+                notes: [
+                    { author: "Adv. L. Bose", date: "2026-01-15", text: "Case successfully resolved. Client satisfied with settlement terms." }
+                ]
+            },
+            "LC-2026-008": {
+                id: "LC-2026-008",
+                title: "Urban Housing Appeal",
+                status: "Active",
+                priority: "Medium",
+                category: "Civil",
+                filingDate: "2025-11-25",
+                court: "District Court, Pune",
+                judge: "Hon'ble Justice K. Patil",
+                description: "Appeal against Urban Housing Board regarding allotment cancellation. Client challenges the cancellation of housing allotment due to alleged documentation irregularities.",
+                client: "Urban Housing Board",
+                advocate: "Adv. N. Kulkarni",
+                opposingParty: "Housing Allottee Association",
+                opposingCounsel: "Adv. D. Joshi",
+                timeline: [
+                    { date: "2025-11-25", title: "Appeal Filed", desc: "Appeal against allotment cancellation" },
+                    { date: "2025-12-30", title: "Stay Order Granted", desc: "Interim stay on cancellation granted" },
+                    { date: "2026-01-22", title: "Document Review", desc: "Housing documents reviewed" }
+                ],
+                hearings: [
+                    { date: "2026-02-28", time: "03:00 PM", purpose: "Appeal Hearing", location: "Court Room 8" }
+                ],
+                documents: [
+                    { name: "Appeal Petition.pdf", size: "2.8 MB", type: "pdf" },
+                    { name: "Allotment Documents.pdf", size: "3.2 MB", type: "pdf" },
+                    { name: "Stay Order.pdf", size: "450 KB", type: "pdf" }
+                ],
+                tasks: [
+                    { title: "Prepare appeal arguments", due: "2026-02-26", completed: false, overdue: false }
+                ],
+                notes: [
+                    { author: "Adv. N. Kulkarni", date: "2026-01-30", text: "Documentation appears in order. Good chance of success on appeal." }
+                ]
+            }
+        };
+
+        function getCaseIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || 'LC-2026-001';
+        }
+
+        function getReferrerPage() {
+            const params = new URLSearchParams(window.location.search);
+            const referrer = params.get('from') || 'cases';
+            console.log('Referrer parameter:', referrer);
+            if (referrer === 'clerk-cases') {
+                return { page: 'clerk-cases.html', label: 'Cases' };
+            }
+            if (referrer === 'advocate-cases') {
+                return { page: 'advocate-cases.html', label: 'Cases' };
+            }
+            return { page: 'cases.html', label: 'Cases' };
+        }
+
+        function updateNavigationLinks() {
+            const referrer = getReferrerPage();
+            console.log('updateNavigationLinks called with referrer:', referrer);
+            
+            const dashboardLink = document.querySelector('a[href="admin-dashboard.html"]');
+            const casesLink = document.querySelector('a[href="cases.html"]');
+            const editBtn = document.getElementById('editCaseBtn');
+            
+            console.log('Edit button element found:', editBtn);
+            console.log('Edit button current display:', editBtn ? editBtn.style.display : 'button not found');
+            
+            // Show edit button for clerk and advocate, hide for others
+            if (editBtn) {
+                if (referrer.page === 'clerk-cases.html' || referrer.page === 'advocate-cases.html') {
+                    editBtn.style.display = 'inline-flex';
+                    editBtn.style.visibility = 'visible';
+                    console.log('✓ Edit button set to VISIBLE for', referrer.page);
+                } else {
+                    editBtn.style.display = 'none';
+                    console.log('✗ Edit button set to HIDDEN for', referrer.page);
+                }
+            } else {
+                console.error('✗ Edit button element NOT FOUND - check if DOM is loaded');
+            }
+            
+            if (referrer.page === 'clerk-cases.html') {
+                if (dashboardLink) dashboardLink.href = 'clerk-dashboard.html';
+                if (casesLink) casesLink.href = 'clerk-cases.html';
+            } else if (referrer.page === 'advocate-cases.html') {
+                if (dashboardLink) dashboardLink.href = 'advocate-dashboard.html';
+                if (casesLink) casesLink.href = 'advocate-cases.html';
+            }
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        }
+
+        function loadCaseDetails() {
+            const caseId = getCaseIdFromURL();
+            const caseData = casesData[caseId];
+
+            if (!caseData) {
+                showToast("Case not found! Redirecting...", 'error');
+                setTimeout(() => window.location.href = "cases.html", 2000);
+                return;
+            }
+
+            // Set basic info
+            document.getElementById("caseTitle").textContent = caseData.title;
+            document.getElementById("caseId").textContent = caseData.id;
+            document.getElementById("statusBadge").className = `status-badge status-${caseData.status.toLowerCase()}`;
+            document.getElementById("statusBadge").textContent = caseData.status;
+            document.getElementById("priorityBadge").className = `priority-badge priority-${caseData.priority.toLowerCase()}`;
+            document.getElementById("priorityBadge").textContent = caseData.priority;
+
+            // Set overview
+            document.getElementById("caseCategory").textContent = caseData.category;
+            document.getElementById("filingDate").textContent = formatDate(caseData.filingDate);
+            document.getElementById("court").textContent = caseData.court;
+            document.getElementById("judge").textContent = caseData.judge;
+            document.getElementById("description").textContent = caseData.description;
+
+            // Set parties
+            document.getElementById("client").textContent = caseData.client;
+            document.getElementById("advocate").textContent = caseData.advocate;
+            document.getElementById("opposingParty").textContent = caseData.opposingParty;
+            document.getElementById("opposingCounsel").textContent = caseData.opposingCounsel;
+
+            // Render timeline
+            const timeline = document.getElementById("timeline");
+            timeline.innerHTML = caseData.timeline.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-icon"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">${formatDate(item.date)}</div>
+                        <div class="timeline-title">${item.title}</div>
+                        <div class="timeline-desc">${item.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render hearings
+            const hearingsList = document.getElementById("hearingsList");
+            hearingsList.innerHTML = caseData.hearings.map(hearing => `
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">${hearing.purpose}</div>
+                        <div class="list-item-meta">
+                            <i class="fas fa-calendar"></i> ${formatDate(hearing.date)} at ${hearing.time}<br>
+                            <i class="fas fa-map-marker-alt"></i> ${hearing.location}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render documents
+            const documentsList = document.getElementById("documentsList");
+            documentsList.innerHTML = caseData.documents.map(doc => `
+                <div class="document-item">
+                    <div class="document-icon">
+                        <i class="fas fa-file-${doc.type === 'pdf' ? 'pdf' : doc.type === 'doc' ? 'word' : 'archive'}"></i>
+                    </div>
+                    <div class="document-info">
+                        <div class="document-name">${doc.name}</div>
+                        <div class="document-size">${doc.size}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.name}')">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            // Render tasks
+            const tasksList = document.getElementById("tasksList");
+            tasksList.innerHTML = caseData.tasks.map(task => `
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
+                           onchange="toggleTask('${task.title}')">
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-due ${task.overdue ? 'task-overdue' : ''}">
+                            <i class="fas fa-clock"></i> Due: ${formatDate(task.due)}
+                            ${task.overdue ? ' <strong>(OVERDUE)</strong>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render notes
+            const notesList = document.getElementById("notesList");
+            notesList.innerHTML = caseData.notes.map(note => `
+                <div class="note-item">
+                    <div class="note-header">
+                        <div class="note-author">${note.author}</div>
+                        <div class="note-date">${formatDate(note.date)}</div>
+                    </div>
+                    <div class="note-text">${note.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function printCase() {
+            window.print();
+        }
+
+        function editCase() {
+            const caseId = getCaseIdFromURL();
+            showToast(`Editing case ${caseId}...`, 'info');
+        }
+
+        function openEditCaseModal() {
+            console.log('openEditCaseModal called');
+            const caseId = getCaseIdFromURL();
+            console.log('Case ID:', caseId);
+            const caseData = casesData[caseId];
+            console.log('Case Data:', caseData);
+            
+            if (!caseData) {
+                showToast('Case data not found', 'error');
+                return;
+            }
+            
+            const modalHTML = `
+                <div class="modal-overlay" id="editModal" onclick="if(event.target === this) closeEditModal()">
+                    <div class="modal" style="max-width: 600px;">
+                        <h3><i class="fas fa-edit"></i> Edit Case</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Case Status</label>
+                                <select id="editStatus">
+                                    <option value="Active" ${caseData.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Pending" ${caseData.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Escalated" ${caseData.status === 'Escalated' ? 'selected' : ''}>Escalated</option>
+                                    <option value="Closed" ${caseData.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select id="editPriority">
+                                    <option value="High" ${caseData.priority === 'High' ? 'selected' : ''}>High</option>
+                                    <option value="Medium" ${caseData.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="Low" ${caseData.priority === 'Low' ? 'selected' : ''}>Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="editDescription">${caseData.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Court</label>
+                            <input type="text" id="editCourt" value="${caseData.court}">
+                        </div>
+                        <div class="form-group">
+                            <label>Judge</label>
+                            <input type="text" id="editJudge" value="${caseData.judge}">
+                        </div>
+                        <div class="modal-buttons">
+                            <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveCase()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            console.log('Modal HTML added to page');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal')?.remove();
+        }
+
+        function saveCase() {
+            console.log('saveCase called');
+            const caseId = getCaseIdFromURL();
+            const caseData = casesData[caseId];
+            
+            if (!caseData) {
+                showToast('Case data not found', 'error');
+                return;
+            }
+            
+            const newStatus = document.getElementById('editStatus').value;
+            const newPriority = document.getElementById('editPriority').value;
+            const newDescription = document.getElementById('editDescription').value;
+            const newCourt = document.getElementById('editCourt').value;
+            const newJudge = document.getElementById('editJudge').value;
+            
+            console.log('Updating case with:', { newStatus, newPriority, newDescription, newCourt, newJudge });
+            
+            caseData.status = newStatus;
+            caseData.priority = newPriority;
+            caseData.description = newDescription;
+            caseData.court = newCourt;
+            caseData.judge = newJudge;
+            
+            console.log('Case updated in memory:', caseData);
+            
+            showToast('Case updated successfully', 'success');
+            closeEditModal();
+            setTimeout(() => {
+                console.log('Reloading page...');
+                location.reload();
+            }, 1000);
+        }
+
+        function downloadDocument(fileName) {
+            showToast(`Downloading ${fileName}...`, 'success');
+        }
+
+        function toggleTask(taskTitle) {
+            showToast(`Task status updated`, 'success');
+        }
+
+        function addNote() {
+            const modalHTML = `
+                <div class="modal-overlay" id="noteModal" onclick="if(event.target === this) closeNoteModal()">
+                    <div class="modal">
+                        <h3><i class="fas fa-sticky-note"></i> Add Case Note</h3>
+                        <textarea id="noteText" placeholder="Enter your case note here..."></textarea>
+                        <div class="modal-buttons">
+                            <button class="btn btn-outline" onclick="closeNoteModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveNote()"><i class="fas fa-save"></i> Save Note</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.getElementById('noteText').focus();
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal')?.remove();
+        }
+
+        function saveNote() {
+            const noteText = document.getElementById('noteText').value.trim();
+            if (noteText) {
+                showToast('Note added successfully', 'success');
+                closeNoteModal();
+                // In real app, save to backend and reload
+            } else {
+                showToast('Please enter a note', 'error');
+            }
+        }
+
+        function logout() {
+            window.location.href = "login.html";
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            toast.innerHTML = `<i class="fas fa-${icon}" style="font-size: 1.2rem; color: var(--${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'}-color);"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize page when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            loadCaseDetails();
+            updateNavigationLinks();
+        });
+    </script>
+</body>
+</html>
