@@ -22,6 +22,8 @@ public class SecurityConfig {
                 .requestMatchers("/admin-dashboard.html", "/advocate-dashboard.html", "/client-dashboard.html", "/clerk-dashboard.html").permitAll()
                 // Allow public access to user management and cases pages
                 .requestMatchers("/user-management.html", "/cases.html", "/case-details.html", "/clerk-cases.html", "/advocate-cases.html").permitAll()
+                // Allow public access to create forms
+                .requestMatchers("/create-case.html", "/create-client.html").permitAll()
                 // Allow public access to static resources
                 .requestMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll()
                 // Allow public access to login page
@@ -32,6 +34,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/dashboard/**").permitAll()
                 // Allow public access to user management API (role check done on frontend)
                 .requestMatchers("/api/users/**").permitAll()
+                // Allow public access to case APIs
+                .requestMatchers("/api/cases/**").permitAll()
+                // Allow public access to client APIs
+                .requestMatchers("/api/clients/**").permitAll()
                 // Require authentication for all other requests
                 .anyRequest().authenticated()
             )

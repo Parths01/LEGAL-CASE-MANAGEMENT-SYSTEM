@@ -1,13 +1,13 @@
 package com.legal.casemanagement.service;
 
-import com.legal.casemanagement.dto.AdminDashboardSummary;
-import com.legal.casemanagement.dto.AdvocateDashboardSummary;
-import com.legal.casemanagement.dto.ClientDashboardSummary;
-import com.legal.casemanagement.dto.ClerkDashboardSummary;
-import com.legal.casemanagement.dto.DashboardCase;
-import com.legal.casemanagement.dto.DashboardDeadline;
-import com.legal.casemanagement.dto.DashboardHearing;
-import com.legal.casemanagement.dto.DashboardItem;
+import com.legal.casemanagement.dto.DashboardDtos.AdminDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.AdvocateDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.ClientDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.ClerkDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.DashboardCase;
+import com.legal.casemanagement.dto.DashboardDtos.DashboardDeadline;
+import com.legal.casemanagement.dto.DashboardDtos.DashboardHearing;
+import com.legal.casemanagement.dto.DashboardDtos.DashboardItem;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;

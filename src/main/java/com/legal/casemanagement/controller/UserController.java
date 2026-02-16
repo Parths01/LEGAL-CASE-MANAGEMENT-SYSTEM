@@ -1,8 +1,8 @@
 package com.legal.casemanagement.controller;
 
-import com.legal.casemanagement.dto.CreateUserRequest;
-import com.legal.casemanagement.dto.UpdateUserRequest;
-import com.legal.casemanagement.dto.UserDTO;
+import com.legal.casemanagement.dto.UserDtos.CreateUserRequest;
+import com.legal.casemanagement.dto.UserDtos.UpdateUserRequest;
+import com.legal.casemanagement.dto.UserDtos.UserDTO;
 import com.legal.casemanagement.entity.User;
 import com.legal.casemanagement.repository.UserRepository;
 import org.springframework.http.HttpStatus;

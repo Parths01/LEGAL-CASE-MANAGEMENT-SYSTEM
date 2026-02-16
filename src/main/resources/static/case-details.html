@@ -19,18 +19,24 @@
             --danger-color: #dc3545;
             --warning-color: #f59e0b;
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-dark); background: var(--bg-light); }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: var(--text-dark); 
+            background: var(--bg-light);
+            line-height: 1.6;
+        }
 
+        /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            padding: 1.5rem 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
         .header .container {
             display: flex;
             justify-content: space-between;
@@ -39,276 +45,331 @@
             margin: 0 auto;
             padding: 0 20px;
         }
-        .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo-icon { font-size: 2.5rem; color: #ffd700; }
-        .firm-name h1 { font-size: 1.5rem; margin: 0; font-weight: 700; }
-        .firm-name p { font-size: 0.85rem; margin: 0; opacity: 0.9; }
-        .nav-menu { display: flex; gap: 25px; list-style: none; align-items: center; }
-        .nav-menu a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
-        .nav-menu a:hover { color: #ffd700; }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: #d4af37;
+        }
+
+        .firm-name h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .firm-name p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .header nav {
+            flex: 1;
+            margin-left: auto;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu a:hover {
+            color: #d4af37;
+        }
+
         .logout-btn {
             background: #dc3545;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: transform 0.3s;
             border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
         }
-        .logout-btn:hover { transform: scale(1.05); background: #c82333; }
 
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Main Content */
         .main-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 30px 20px;
         }
 
+        /* Breadcrumb */
         .breadcrumb {
-            display: flex;
-            gap: 8px;
             margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: var(--text-light);
         }
+
         .breadcrumb a {
             color: var(--accent-color);
-            text-decoration: none;
-        }
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 25px;
-            gap: 20px;
-        }
-        .page-header h1 {
-            color: var(--primary-color);
-            font-size: 2rem;
-            margin: 0 0 8px;
-        }
-        .case-meta {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-weight: 500;
         }
-        .btn-primary { background: var(--accent-color); color: white; }
-        .btn-primary:hover { background: #1976d2; }
-        .btn-outline { background: transparent; color: var(--primary-color); border: 1px solid #cbd5e1; }
-        .btn-outline:hover { background: #f1f5f9; }
-        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
 
-        .status-badge, .priority-badge {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
+        .breadcrumb a:hover {
+            text-decoration: underline;
         }
-        .status-active { background: #dcfce7; color: #166534; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-closed { background: #e5e7eb; color: #374151; }
-        .status-escalated { background: #fee2e2; color: #991b1b; }
-        .priority-high { background: #fee2e2; color: #991b1b; }
-        .priority-medium { background: #fef3c7; color: #92400e; }
-        .priority-low { background: #dbeafe; color: #1e40af; }
 
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Content Grid */
         .content-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 30px;
         }
 
+        /* Card Styles */
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 22px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid rgba(0,0,0,0.03);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         .card h3 {
-            font-size: 1.1rem;
             color: var(--primary-color);
-            margin-bottom: 18px;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .card h3 i {
             color: var(--accent-color);
         }
 
+        /* Info Row */
         .info-row {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
         }
+
         .info-row:last-child {
             border-bottom: none;
         }
+
         .info-label {
             font-weight: 600;
-            color: var(--text-light);
-            font-size: 0.92rem;
-        }
-        .info-value {
-            color: var(--text-dark);
+            color: var(--primary-color);
+            min-width: 150px;
         }
 
+        .info-value {
+            color: var(--text-light);
+            flex: 1;
+            text-align: right;
+        }
+
+        /* Timeline */
         .timeline {
             position: relative;
+            padding: 20px 0;
         }
-        .timeline-item {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .timeline-item::before {
+
+        .timeline::before {
             content: '';
             position: absolute;
-            left: 8px;
-            top: 25px;
+            left: 15px;
+            top: 0;
+            bottom: 0;
             width: 2px;
-            height: calc(100% + 10px);
             background: #e5e7eb;
         }
-        .timeline-item:last-child::before {
-            display: none;
+
+        .timeline-item {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            position: relative;
         }
+
         .timeline-icon {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
             background: var(--accent-color);
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px #e5e7eb;
+            border-radius: 50%;
             flex-shrink: 0;
-            margin-top: 4px;
+            margin-top: 2px;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
         }
+
         .timeline-content {
             flex: 1;
+            padding-top: 2px;
         }
+
         .timeline-date {
             font-size: 0.85rem;
-            color: var(--text-light);
-            margin-bottom: 4px;
+            color: var(--accent-color);
+            font-weight: 600;
         }
+
         .timeline-title {
+            font-size: 1rem;
             font-weight: 600;
             color: var(--primary-color);
-            margin-bottom: 4px;
+            margin-top: 4px;
         }
+
         .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* Lists */
+        .list-item {
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+        }
+
+        .list-item-meta {
             font-size: 0.9rem;
             color: var(--text-light);
         }
 
-        .list-item {
+        .list-item-meta i {
+            margin-right: 6px;
+            color: var(--accent-color);
+        }
+
+        /* Documents */
+        .document-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+            gap: 15px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
-        .list-item:last-child {
-            border-bottom: none;
+
+        .document-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
         }
-        .list-item-title {
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
             font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 4px;
+            color: var(--primary-color);
         }
-        .list-item-meta {
+
+        .document-size {
             font-size: 0.85rem;
             color: var(--text-light);
         }
 
-        .document-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        .document-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #f0f9ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-color);
-            font-size: 1.2rem;
-        }
-        .document-info {
-            flex: 1;
-        }
-        .document-name {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.92rem;
-        }
-        .document-size {
-            font-size: 0.82rem;
-            color: var(--text-light);
-        }
-
+        /* Tasks */
         .task-item {
             display: flex;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            align-items: flex-start;
         }
-        .task-item:last-child {
-            border-bottom: none;
-        }
+
         .task-checkbox {
-            width: 18px;
-            height: 18px;
-            margin-top: 2px;
+            margin-top: 4px;
             cursor: pointer;
         }
+
         .task-content {
             flex: 1;
         }
+
         .task-title {
             font-size: 0.92rem;
             color: var(--text-dark);
             margin-bottom: 4px;
+            font-weight: 500;
         }
+
         .task-due {
             font-size: 0.8rem;
             color: var(--text-light);
         }
+
         .task-overdue {
             color: var(--danger-color);
             font-weight: 600;
         }
 
+        /* Notes */
         .note-item {
             background: #fffbeb;
             border-left: 3px solid #fbbf24;
@@ -316,23 +377,110 @@
             border-radius: 6px;
             margin-bottom: 12px;
         }
+
         .note-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 6px;
         }
+
         .note-author {
             font-weight: 600;
             font-size: 0.9rem;
             color: var(--text-dark);
         }
+
         .note-date {
             font-size: 0.82rem;
             color: var(--text-light);
         }
+
         .note-text {
             font-size: 0.9rem;
             color: var(--text-dark);
+        }
+
+        /* Badge styles */
+        .status-badge, .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Status badge colors */
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .status-closed, .status-completed {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        .status-on-hold {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        /* Priority badge colors */
+        .priority-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .priority-medium {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .priority-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .priority-urgent {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976d2;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary-color);
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
         }
 
         .btn-group {
@@ -340,6 +488,7 @@
             gap: 10px;
         }
 
+        /* Toast Notifications */
         .toast {
             position: fixed;
             top: 80px;
@@ -363,6 +512,7 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -404,6 +554,7 @@
             margin-top: 16px;
         }
 
+        /* Forms */
         .form-group {
             margin-bottom: 16px;
         }
@@ -434,6 +585,7 @@
             gap: 16px;
         }
 
+        /* Responsive */
         @media (max-width: 1024px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -441,6 +593,9 @@
         }
         @media (max-width: 768px) {
             .nav-menu { flex-direction: column; gap: 12px; }
+            .page-header { flex-direction: column; gap: 15px; }
+            .btn-group { flex-wrap: wrap; }
+            .form-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -574,6 +729,7 @@
     </div>
 
     <script>
+        let caseData = null;
         // Sample case data - in real app, fetch from API
         const casesData = {
             "LC-2026-001": {
@@ -887,19 +1043,21 @@
             const dashboardLink = document.querySelector('a[href="admin-dashboard.html"]');
             const casesLink = document.querySelector('a[href="cases.html"]');
             const editBtn = document.getElementById('editCaseBtn');
+            const userRole = localStorage.getItem('userRole');
             
             console.log('Edit button element found:', editBtn);
             console.log('Edit button current display:', editBtn ? editBtn.style.display : 'button not found');
+            console.log('User role:', userRole);
             
-            // Show edit button for clerk and advocate, hide for others
+            // Show edit button for ADMIN, CLERK, and ADVOCATE
             if (editBtn) {
-                if (referrer.page === 'clerk-cases.html' || referrer.page === 'advocate-cases.html') {
+                if (userRole === 'ADMIN' || referrer.page === 'clerk-cases.html' || referrer.page === 'advocate-cases.html') {
                     editBtn.style.display = 'inline-flex';
                     editBtn.style.visibility = 'visible';
-                    console.log('✓ Edit button set to VISIBLE for', referrer.page);
+                    console.log('✓ Edit button set to VISIBLE for role:', userRole);
                 } else {
                     editBtn.style.display = 'none';
-                    console.log('✗ Edit button set to HIDDEN for', referrer.page);
+                    console.log('✗ Edit button set to HIDDEN for role:', userRole);
                 }
             } else {
                 console.error('✗ Edit button element NOT FOUND - check if DOM is loaded');
@@ -911,116 +1069,219 @@
             } else if (referrer.page === 'advocate-cases.html') {
                 if (dashboardLink) dashboardLink.href = 'advocate-dashboard.html';
                 if (casesLink) casesLink.href = 'advocate-cases.html';
+            } else if (userRole === 'ADMIN') {
+                if (dashboardLink) dashboardLink.href = 'admin-dashboard.html';
+                if (casesLink) casesLink.href = 'cases.html';
             }
         }
 
         function formatDate(dateStr) {
+            if (!dateStr) return "N/A";
             const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "N/A";
             return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
         }
 
-        function loadCaseDetails() {
+        async function loadCaseDetails() {
             const caseId = getCaseIdFromURL();
-            const caseData = casesData[caseId];
+            if (!caseId) {
+                showToast("No case selected!", 'error');
+                return;
+            }
+            
+            // Get user context from localStorage
+            const userId = localStorage.getItem('userId');
+            const userRole = localStorage.getItem('userRole');
+            
+            // Show loading state
+            document.getElementById("caseTitle").textContent = "Loading case details...";
+            
+            try {
+                console.log('📍 Fetching case details for:', caseId);
+                
+                // Build API URL with user context
+                let apiUrl = `/api/cases/${caseId}`;
+                const params = new URLSearchParams();
+                if (userId) params.append('userId', userId);
+                if (userRole) params.append('role', userRole);
+                if (params.toString()) {
+                    apiUrl += '?' + params.toString();
+                }
+                
+                const response = await fetch(apiUrl);
+                
+                console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API error:', response.status, errorText);
+                    
+                    if (response.status === 404) {
+                        showErrorPage('Case not found', 'The case you are looking for does not exist or you do not have access.');
+                    } else if (response.status === 403) {
+                        showErrorPage('Access Denied', 'You do not have permission to view this case.');
+                    } else {
+                        showErrorPage('Error', `Failed to load case (HTTP ${response.status})`);
+                    }
+                    return;
+                }
+                
+                caseData = await response.json();
+                console.log('✅ Loaded case data successfully:', caseData);
+                renderCaseDetails();
+            } catch (error) {
+                console.error('❌ Error loading case:', error);
+                showErrorPage('Error', `Failed to load case: ${error.message}`);
+            }
+        }
+        
+        function showErrorPage(title, message) {
+            document.querySelector('.page-header').innerHTML = `
+                <div style="text-align: center; padding: 40px; width: 100%;">
+                    <h2 style="color: #dc3545; margin-bottom: 15px;">⚠️ ${title}</h2>
+                    <p style="color: #666; margin-bottom: 25px;">${message}</p>
+                    <a href="cases.html" class="btn btn-primary">← Back to Cases</a>
+                </div>
+            `;
+        }
 
+        function renderCaseDetails() {
             if (!caseData) {
-                showToast("Case not found! Redirecting...", 'error');
-                setTimeout(() => window.location.href = "cases.html", 2000);
+                const pageHeader = document.querySelector('.page-header');
+                if (pageHeader) {
+                    pageHeader.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <h2 style="color: #dc3545;">⚠️ Error Loading Case</h2>
+                            <p style="color: #666; margin-top: 10px;">The case details could not be loaded. Please try again or go back.</p>
+                            <a href="cases.html" class="btn btn-primary" style="margin-top: 20px;">← Back to Cases</a>
+                        </div>
+                    `;
+                }
                 return;
             }
 
-            // Set basic info
-            document.getElementById("caseTitle").textContent = caseData.title;
-            document.getElementById("caseId").textContent = caseData.id;
-            document.getElementById("statusBadge").className = `status-badge status-${caseData.status.toLowerCase()}`;
-            document.getElementById("statusBadge").textContent = caseData.status;
-            document.getElementById("priorityBadge").className = `priority-badge priority-${caseData.priority.toLowerCase()}`;
-            document.getElementById("priorityBadge").textContent = caseData.priority;
+            try {
+                // Set basic info
+                document.getElementById("caseTitle").textContent = caseData.title || "N/A";
+                document.getElementById("caseId").textContent = caseData.caseNumber || "N/A";
+                document.getElementById("statusBadge").className = `status-badge status-${String(caseData.status || 'pending').toLowerCase()}`;
+                document.getElementById("statusBadge").textContent = caseData.status || "N/A";
+                document.getElementById("priorityBadge").className = `priority-badge priority-${String(caseData.priority || 'medium').toLowerCase()}`;
+                document.getElementById("priorityBadge").textContent = caseData.priority || "N/A";
 
-            // Set overview
-            document.getElementById("caseCategory").textContent = caseData.category;
-            document.getElementById("filingDate").textContent = formatDate(caseData.filingDate);
-            document.getElementById("court").textContent = caseData.court;
-            document.getElementById("judge").textContent = caseData.judge;
-            document.getElementById("description").textContent = caseData.description;
+                // Set overview
+                document.getElementById("caseCategory").textContent = caseData.category || "N/A";
+                document.getElementById("filingDate").textContent = formatDate(caseData.filingDate);
+                document.getElementById("court").textContent = caseData.court || "N/A";
+                document.getElementById("judge").textContent = caseData.judge || "N/A";
+                document.getElementById("description").textContent = caseData.description || "No description available";
 
-            // Set parties
-            document.getElementById("client").textContent = caseData.client;
-            document.getElementById("advocate").textContent = caseData.advocate;
-            document.getElementById("opposingParty").textContent = caseData.opposingParty;
-            document.getElementById("opposingCounsel").textContent = caseData.opposingCounsel;
+                // Set parties
+                document.getElementById("client").textContent = caseData.client || "N/A";
+                document.getElementById("advocate").textContent = caseData.advocate || "N/A";
+                document.getElementById("opposingParty").textContent = caseData.opposingParty || "N/A";
+                document.getElementById("opposingCounsel").textContent = caseData.opposingCounsel || "N/A";
 
-            // Render timeline
-            const timeline = document.getElementById("timeline");
-            timeline.innerHTML = caseData.timeline.map(item => `
-                <div class="timeline-item">
-                    <div class="timeline-icon"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">${formatDate(item.date)}</div>
-                        <div class="timeline-title">${item.title}</div>
-                        <div class="timeline-desc">${item.desc}</div>
-                    </div>
-                </div>
-            `).join('');
-
-            // Render hearings
-            const hearingsList = document.getElementById("hearingsList");
-            hearingsList.innerHTML = caseData.hearings.map(hearing => `
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">${hearing.purpose}</div>
-                        <div class="list-item-meta">
-                            <i class="fas fa-calendar"></i> ${formatDate(hearing.date)} at ${hearing.time}<br>
-                            <i class="fas fa-map-marker-alt"></i> ${hearing.location}
+                // Render timeline
+                const timeline = document.getElementById("timeline");
+                const timelineItems = caseData.timeline || [];
+                if (timelineItems.length === 0) {
+                    timeline.innerHTML = '<p style="text-align: center; color: #999;">No timeline events available</p>';
+                } else {
+                    timeline.innerHTML = timelineItems.map(item => `
+                        <div class="timeline-item">
+                            <div class="timeline-icon"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">${formatDate(item.date)}</div>
+                                <div class="timeline-title">${item.title || 'Event'}</div>
+                                <div class="timeline-desc">${item.desc || ''}</div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    `).join('');
+                }
 
-            // Render documents
-            const documentsList = document.getElementById("documentsList");
-            documentsList.innerHTML = caseData.documents.map(doc => `
-                <div class="document-item">
-                    <div class="document-icon">
-                        <i class="fas fa-file-${doc.type === 'pdf' ? 'pdf' : doc.type === 'doc' ? 'word' : 'archive'}"></i>
-                    </div>
-                    <div class="document-info">
-                        <div class="document-name">${doc.name}</div>
-                        <div class="document-size">${doc.size}</div>
-                    </div>
-                    <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.name}')">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </div>
-            `).join('');
-
-            // Render tasks
-            const tasksList = document.getElementById("tasksList");
-            tasksList.innerHTML = caseData.tasks.map(task => `
-                <div class="task-item">
-                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
-                           onchange="toggleTask('${task.title}')">
-                    <div class="task-content">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-due ${task.overdue ? 'task-overdue' : ''}">
-                            <i class="fas fa-clock"></i> Due: ${formatDate(task.due)}
-                            ${task.overdue ? ' <strong>(OVERDUE)</strong>' : ''}
+                // Render hearings
+                const hearingsList = document.getElementById("hearingsList");
+                const hearingItems = caseData.hearings || [];
+                if (hearingItems.length === 0) {
+                    hearingsList.innerHTML = '<p style="text-align: center; color: #999;">No upcoming hearings scheduled</p>';
+                } else {
+                    hearingsList.innerHTML = hearingItems.map(hearing => `
+                        <div class="list-item">
+                            <div>
+                                <div class="list-item-title">${hearing.purpose || 'Hearing'}</div>
+                                <div class="list-item-meta">
+                                    <i class="fas fa-calendar"></i> ${formatDate(hearing.date)} at ${hearing.time || 'TBD'}<br>
+                                    <i class="fas fa-map-marker-alt"></i> ${hearing.location || 'Court'}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    `).join('');
+                }
 
-            // Render notes
-            const notesList = document.getElementById("notesList");
-            notesList.innerHTML = caseData.notes.map(note => `
-                <div class="note-item">
-                    <div class="note-header">
-                        <div class="note-author">${note.author}</div>
-                        <div class="note-date">${formatDate(note.date)}</div>
-                    </div>
-                    <div class="note-text">${note.text}</div>
-                </div>
-            `).join('');
+                // Render documents
+                const documentsList = document.getElementById("documentsList");
+                const documentItems = caseData.documents || [];
+                if (documentItems.length === 0) {
+                    documentsList.innerHTML = '<p style="text-align: center; color: #999;">No documents uploaded</p>';
+                } else {
+                    documentsList.innerHTML = documentItems.map(doc => `
+                        <div class="document-item">
+                            <div class="document-icon">
+                                <i class="fas fa-file-${doc.type === 'pdf' ? 'pdf' : doc.type === 'doc' ? 'word' : 'archive'}"></i>
+                            </div>
+                            <div class="document-info">
+                                <div class="document-name">${doc.name || 'Document'}</div>
+                                <div class="document-size">${doc.size || 'N/A'}</div>
+                            </div>
+                            <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.name}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+
+                // Render tasks
+                const tasksList = document.getElementById("tasksList");
+                const taskItems = caseData.tasks || [];
+                if (taskItems.length === 0) {
+                    tasksList.innerHTML = '<p style="text-align: center; color: #999;">No tasks assigned</p>';
+                } else {
+                    tasksList.innerHTML = taskItems.map(task => `
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
+                                   onchange="toggleTask(${task.id}, this.checked)">
+                            <div class="task-content">
+                                <div class="task-title">${task.title || 'Task'}</div>
+                                <div class="task-due ${task.overdue ? 'task-overdue' : ''}">
+                                    <i class="fas fa-clock"></i> Due: ${formatDate(task.due)}
+                                    ${task.overdue ? ' <strong>(OVERDUE)</strong>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Render notes
+                const notesList = document.getElementById("notesList");
+                const noteItems = caseData.notes || [];
+                if (noteItems.length === 0) {
+                    notesList.innerHTML = '<p style="text-align: center; color: #999;">No notes added yet</p>';
+                } else {
+                    notesList.innerHTML = noteItems.map(note => `
+                        <div class="note-item">
+                            <div class="note-header">
+                                <div class="note-author">${note.author || 'Unknown'}</div>
+                                <div class="note-date">${formatDate(note.date)}</div>
+                            </div>
+                            <div class="note-text">${note.text || ''}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error rendering case details:', error);
+                showToast('Error displaying case details', 'error');
+            }
         }
 
         function printCase() {
@@ -1036,10 +1297,10 @@
             console.log('openEditCaseModal called');
             const caseId = getCaseIdFromURL();
             console.log('Case ID:', caseId);
-            const caseData = casesData[caseId];
+            const currentCase = caseData;
             console.log('Case Data:', caseData);
             
-            if (!caseData) {
+            if (!currentCase) {
                 showToast('Case data not found', 'error');
                 return;
             }
@@ -1052,32 +1313,32 @@
                             <div class="form-group">
                                 <label>Case Status</label>
                                 <select id="editStatus">
-                                    <option value="Active" ${caseData.status === 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Pending" ${caseData.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="Escalated" ${caseData.status === 'Escalated' ? 'selected' : ''}>Escalated</option>
-                                    <option value="Closed" ${caseData.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                                    <option value="Active" ${currentCase.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Pending" ${currentCase.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Escalated" ${currentCase.status === 'Escalated' ? 'selected' : ''}>Escalated</option>
+                                    <option value="Closed" ${currentCase.status === 'Closed' ? 'selected' : ''}>Closed</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Priority</label>
                                 <select id="editPriority">
-                                    <option value="High" ${caseData.priority === 'High' ? 'selected' : ''}>High</option>
-                                    <option value="Medium" ${caseData.priority === 'Medium' ? 'selected' : ''}>Medium</option>
-                                    <option value="Low" ${caseData.priority === 'Low' ? 'selected' : ''}>Low</option>
+                                    <option value="High" ${currentCase.priority === 'High' ? 'selected' : ''}>High</option>
+                                    <option value="Medium" ${currentCase.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="Low" ${currentCase.priority === 'Low' ? 'selected' : ''}>Low</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea id="editDescription">${caseData.description}</textarea>
+                            <textarea id="editDescription">${currentCase.description || ''}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Court</label>
-                            <input type="text" id="editCourt" value="${caseData.court}">
+                            <input type="text" id="editCourt" value="${currentCase.court || ''}">
                         </div>
                         <div class="form-group">
                             <label>Judge</label>
-                            <input type="text" id="editJudge" value="${caseData.judge}">
+                            <input type="text" id="editJudge" value="${currentCase.judge || ''}">
                         </div>
                         <div class="modal-buttons">
                             <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
@@ -1094,12 +1355,12 @@
             document.getElementById('editModal')?.remove();
         }
 
-        function saveCase() {
+        async function saveCase() {
             console.log('saveCase called');
             const caseId = getCaseIdFromURL();
-            const caseData = casesData[caseId];
+            const currentCase = caseData;
             
-            if (!caseData) {
+            if (!currentCase) {
                 showToast('Case data not found', 'error');
                 return;
             }
@@ -1112,28 +1373,57 @@
             
             console.log('Updating case with:', { newStatus, newPriority, newDescription, newCourt, newJudge });
             
-            caseData.status = newStatus;
-            caseData.priority = newPriority;
-            caseData.description = newDescription;
-            caseData.court = newCourt;
-            caseData.judge = newJudge;
-            
-            console.log('Case updated in memory:', caseData);
-            
-            showToast('Case updated successfully', 'success');
-            closeEditModal();
-            setTimeout(() => {
-                console.log('Reloading page...');
-                location.reload();
-            }, 1000);
+            try {
+                const response = await fetch(`/api/cases/${caseId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        priority: newPriority,
+                        description: newDescription,
+                        court: newCourt,
+                        judge: newJudge
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update case');
+                }
+
+                currentCase.status = newStatus;
+                currentCase.priority = newPriority;
+                currentCase.description = newDescription;
+                currentCase.court = newCourt;
+                currentCase.judge = newJudge;
+                renderCaseDetails();
+                showToast('Case updated successfully', 'success');
+                closeEditModal();
+            } catch (error) {
+                console.error(error);
+                showToast('Unable to update case', 'error');
+            }
         }
 
         function downloadDocument(fileName) {
             showToast(`Downloading ${fileName}...`, 'success');
         }
 
-        function toggleTask(taskTitle) {
-            showToast(`Task status updated`, 'success');
+        async function toggleTask(taskId, completed) {
+            const caseId = getCaseIdFromURL();
+            try {
+                const response = await fetch(`/api/cases/${caseId}/tasks/${taskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed })
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to update task');
+                }
+                showToast(`Task status updated`, 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('Unable to update task', 'error');
+            }
         }
 
         function addNote() {
@@ -1157,14 +1447,40 @@
             document.getElementById('noteModal')?.remove();
         }
 
-        function saveNote() {
+        async function saveNote() {
             const noteText = document.getElementById('noteText').value.trim();
-            if (noteText) {
+            if (!noteText) {
+                showToast('Please enter a note', 'error');
+                return;
+            }
+
+            const caseId = getCaseIdFromURL();
+            const userId = localStorage.getItem('userId');
+            const authorName = localStorage.getItem('userName');
+
+            try {
+                const response = await fetch(`/api/cases/${caseId}/notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: noteText,
+                        userId: userId ? Number(userId) : null,
+                        authorName
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add note');
+                }
+
+                const newNote = await response.json();
+                caseData.notes = [newNote, ...(caseData.notes || [])];
+                renderCaseDetails();
                 showToast('Note added successfully', 'success');
                 closeNoteModal();
-                // In real app, save to backend and reload
-            } else {
-                showToast('Please enter a note', 'error');
+            } catch (error) {
+                console.error(error);
+                showToast('Unable to add note', 'error');
             }
         }
 

@@ -212,28 +212,28 @@
                 <button class="btn btn-outline">View all</button>
             </div>
             <div class="action-grid">
-                <div class="action">
+                <a href="create-case.html" class="action" style="text-decoration: none; color: inherit; cursor: pointer;">
                     <div class="icon"><i class="fas fa-plus"></i></div>
                     <div>
                         <div><strong>Create Case</strong></div>
                         <div class="text-muted">Open a new case file</div>
                     </div>
-                </div>
-                <div class="action">
+                </a>
+                <div class="action" onclick="openUploadDocumentModal()" style="cursor: pointer;">
                     <div class="icon"><i class="fas fa-file-alt"></i></div>
                     <div>
                         <div><strong>Upload Document</strong></div>
                         <div class="text-muted">Add evidence or filings</div>
                     </div>
                 </div>
-                <div class="action">
+                <div class="action" onclick="openScheduleHearingModal()" style="cursor: pointer;">
                     <div class="icon"><i class="fas fa-calendar-check"></i></div>
                     <div>
                         <div><strong>Schedule Hearing</strong></div>
                         <div class="text-muted">Manage court calendar</div>
                     </div>
                 </div>
-                <div class="action">
+                <div class="action" onclick="openClientMessageModal()" style="cursor: pointer;">
                     <div class="icon"><i class="fas fa-comments"></i></div>
                     <div>
                         <div><strong>Client Message</strong></div>
@@ -272,8 +272,305 @@
         </div>
     </div>
 
+    <!-- Upload Document Modal -->
+    <div id="uploadDocumentModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+            <h3>Upload Document</h3>
+            <form id="uploadDocumentForm" onsubmit="submitUploadDocument(event)">
+                <div style="margin-bottom: 15px;">
+                    <label>Select Case:</label>
+                    <select id="docCaseId" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <option value="">-- Loading cases --</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Document Name:</label>
+                    <input type="text" id="docName" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Document Type:</label>
+                    <select id="docType" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <option value="OTHER">Other</option>
+                        <option value="PETITION">Petition</option>
+                        <option value="EVIDENCE">Evidence</option>
+                        <option value="AFFIDAVIT">Affidavit</option>
+                        <option value="ORDER">Order</option>
+                        <option value="NOTICE">Notice</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Description:</label>
+                    <textarea id="docDescription" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 80px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Upload</button>
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeUploadDocumentModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Schedule Hearing Modal -->
+    <div id="scheduleHearingModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+            <h3>Schedule Hearing</h3>
+            <form id="scheduleHearingForm" onsubmit="submitScheduleHearing(event)">
+                <div style="margin-bottom: 15px;">
+                    <label>Select Case:</label>
+                    <select id="hearingCaseId" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <option value="">-- Loading cases --</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Hearing Date:</label>
+                    <input type="date" id="hearingDate" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Hearing Time:</label>
+                    <input type="time" id="hearingTime" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Courtroom:</label>
+                    <input type="text" id="courtroom" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Hearing Type:</label>
+                    <select id="hearingType" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <option value="OTHER">Other</option>
+                        <option value="PRELIMINARY">Preliminary</option>
+                        <option value="EVIDENCE">Evidence</option>
+                        <option value="ARGUMENTS">Arguments</option>
+                        <option value="JUDGMENT">Judgment</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Remarks:</label>
+                    <textarea id="hearingRemarks" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 80px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Schedule</button>
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeScheduleHearingModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Message Modal -->
+    <div id="clientMessageModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+            <h3>Send Client Message</h3>
+            <form id="clientMessageForm" onsubmit="submitClientMessage(event)">
+                <div style="margin-bottom: 15px;">
+                    <label>Case ID:</label>
+                    <input type="number" id="msgCaseId" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Recipient ID:</label>
+                    <input type="number" id="msgRecipientId" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Subject:</label>
+                    <input type="text" id="msgSubject" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Message:</label>
+                    <textarea id="msgText" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 120px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Send</button>
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeClientMessageModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function openUploadDocumentModal() {
+            loadAdvocateCases();
+            document.getElementById('uploadDocumentModal').style.display = 'flex';
+        }
+
+        async function loadAdvocateCases() {
+            const userId = localStorage.getItem('userId') || '1';
+            try {
+                const response = await fetch(`/api/cases/advocate/${userId}`);
+                if (response.ok) {
+                    const cases = await response.json();
+                    const select = document.getElementById('docCaseId');
+                    select.innerHTML = '';
+                    
+                    if (cases.length === 0) {
+                        select.innerHTML = '<option value="">No cases found</option>';
+                    } else {
+                        select.innerHTML = '<option value="">-- Select a case --</option>';
+                        cases.forEach((caseItem, index) => {
+                            const option = document.createElement('option');
+                            // Use case_number as value since that's what we have
+                            option.value = caseItem.caseNumber;
+                            option.textContent = `${caseItem.caseNumber} - ${caseItem.title} (${caseItem.status})`;
+                            select.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                const select = document.getElementById('docCaseId');
+                select.innerHTML = '<option value="">Error loading cases</option>';
+            }
+        }
+
+        function closeUploadDocumentModal() {
+            document.getElementById('uploadDocumentModal').style.display = 'none';
+        }
+
+        async function openScheduleHearingModal() {
+            document.getElementById('scheduleHearingModal').style.display = 'flex';
+            await loadAdvocateCasesForHearing();
+        }
+
+        async function loadAdvocateCasesForHearing() {
+            try {
+                const userId = localStorage.getItem('userId') || '1';
+                const response = await fetch(`/api/cases/advocate/${userId}`);
+                if (response.ok) {
+                    const cases = await response.json();
+                    const select = document.getElementById('hearingCaseId');
+                    select.innerHTML = '';
+                    
+                    if (cases.length === 0) {
+                        select.innerHTML = '<option value="">No cases found</option>';
+                    } else {
+                        select.innerHTML = '<option value="">-- Select a case --</option>';
+                        cases.forEach((caseItem, index) => {
+                            const option = document.createElement('option');
+                            option.value = caseItem.caseNumber;
+                            option.textContent = `${caseItem.caseNumber} - ${caseItem.title} (${caseItem.status})`;
+                            select.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                const select = document.getElementById('hearingCaseId');
+                select.innerHTML = '<option value="">Error loading cases</option>';
+            }
+        }
+
+        function closeScheduleHearingModal() {
+            document.getElementById('scheduleHearingModal').style.display = 'none';
+        }
+
+        function openClientMessageModal() {
+            document.getElementById('clientMessageModal').style.display = 'flex';
+        }
+
+        function closeClientMessageModal() {
+            document.getElementById('clientMessageModal').style.display = 'none';
+        }
+
+        async function submitUploadDocument(e) {
+            e.preventDefault();
+            const caseNumber = document.getElementById('docCaseId').value;
+            
+            if (!caseNumber) {
+                alert('Please select a case');
+                return;
+            }
+            
+            const data = {
+                caseNumber: caseNumber,
+                documentName: document.getElementById('docName').value,
+                documentType: document.getElementById('docType').value,
+                description: document.getElementById('docDescription').value,
+                fileData: ''
+            };
+
+            try {
+                const response = await fetch('/api/cases/documents/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': localStorage.getItem('userId') || '1'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Document uploaded successfully!');
+                    closeUploadDocumentModal();
+                    document.getElementById('uploadDocumentForm').reset();
+                } else {
+                    alert('Failed to upload document');
+                }
+            } catch (error) {
+                alert('Error uploading document: ' + error.message);
+            }
+        }
+
+        async function submitScheduleHearing(e) {
+            e.preventDefault();
+            const caseNumber = document.getElementById('hearingCaseId').value;
+            const data = {
+                caseNumber: caseNumber,
+                hearingDate: document.getElementById('hearingDate').value,
+                hearingTime: document.getElementById('hearingTime').value,
+                courtroom: document.getElementById('courtroom').value,
+                hearingType: document.getElementById('hearingType').value,
+                remarks: document.getElementById('hearingRemarks').value
+            };
+
+            try {
+                const response = await fetch('/api/cases/hearings/schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Hearing scheduled successfully!');
+                    closeScheduleHearingModal();
+                    document.getElementById('scheduleHearingForm').reset();
+                } else {
+                    alert('Failed to schedule hearing');
+                }
+            } catch (error) {
+                alert('Error scheduling hearing: ' + error.message);
+            }
+        }
+
+        async function submitClientMessage(e) {
+            e.preventDefault();
+            const data = {
+                caseId: parseInt(document.getElementById('msgCaseId').value),
+                recipientId: parseInt(document.getElementById('msgRecipientId').value),
+                subject: document.getElementById('msgSubject').value,
+                messageText: document.getElementById('msgText').value
+            };
+
+            try {
+                const response = await fetch('/api/cases/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': localStorage.getItem('userId') || '1'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Message sent successfully!');
+                    closeClientMessageModal();
+                    document.getElementById('clientMessageForm').reset();
+                } else {
+                    alert('Failed to send message');
+                }
+            } catch (error) {
+                alert('Error sending message: ' + error.message);
+            }
+        }
         // Check if user is authenticated and has ADVOCATE role
         function checkAuthorization() {
             const userRole = localStorage.getItem('userRole');

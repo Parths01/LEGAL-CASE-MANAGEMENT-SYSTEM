@@ -1,7 +1,7 @@
 package com.legal.casemanagement.controller;
 
-import com.legal.casemanagement.dto.LoginRequest;
-import com.legal.casemanagement.dto.LoginResponse;
+import com.legal.casemanagement.dto.AuthDtos.LoginRequest;
+import com.legal.casemanagement.dto.AuthDtos.LoginResponse;
 import com.legal.casemanagement.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

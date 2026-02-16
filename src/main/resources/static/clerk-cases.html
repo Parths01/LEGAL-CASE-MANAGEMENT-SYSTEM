@@ -320,17 +320,14 @@
 
     <script>
         // Cases assigned to clerk (filtered view)
-        const cases = [
-            { id: "LC-2026-001", title: "Rao vs. Mehta", advocate: "Adv. S. Verma", status: "Active", nextHearing: "2026-02-12" },
-            { id: "LC-2026-003", title: "Skyline Builders Contract", advocate: "Adv. A. Patel", status: "Active", nextHearing: "2026-03-03" },
-            { id: "LC-2026-004", title: "Nair Divorce Settlement", advocate: "Adv. M. Joseph", status: "Escalated", nextHearing: "2026-02-10" },
-            { id: "LC-2026-005", title: "Verma Property Dispute", advocate: "Adv. T. Roy", status: "Active", nextHearing: "2026-02-22" }
-        ];
+        let cases = [];
 
         const statusRank = { Escalated: 1, Active: 2, Pending: 3, Closed: 4 };
 
         function formatDate(dateStr) {
+            if (!dateStr) return "N/A";
             const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "N/A";
             return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
         }
 
@@ -367,20 +364,25 @@
             list.forEach(item => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${item.id}</td>
+                    <td>${item.caseNumber}</td>
                     <td>${item.title}</td>
                     <td>${item.advocate}</td>
                     <td><span class="${getBadgeClass(item.status, "status")}">${item.status}</span></td>
                     <td>${formatDate(item.nextHearing)}</td>
                     <td>
                         <div class="table-actions">
-                            <button class="btn btn-outline btn-sm" onclick="viewCase('${item.id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-primary btn-sm" onclick="viewCase('${item.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-outline btn-sm" onclick="viewCase('${item.caseNumber}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-primary btn-sm" onclick="viewCase('${item.caseNumber}')"><i class="fas fa-pen"></i></button>
                         </div>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        function toDateValue(dateStr) {
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? Number.MAX_SAFE_INTEGER : date.getTime();
         }
 
         function applyFilters() {
@@ -389,7 +391,7 @@
             const sort = document.getElementById("sortFilter").value;
 
             let filtered = cases.filter(c => {
-                const matchesQuery = [c.id, c.title, c.advocate]
+                const matchesQuery = [c.caseNumber, c.title, c.advocate]
                     .some(field => field.toLowerCase().includes(query));
                 const matchesStatus = status ? c.status === status : true;
                 return matchesQuery && matchesStatus;
@@ -398,7 +400,7 @@
             filtered = filtered.sort((a, b) => {
                 if (sort === "advocate") return a.advocate.localeCompare(b.advocate);
                 if (sort === "status") return statusRank[a.status] - statusRank[b.status];
-                return new Date(a.nextHearing) - new Date(b.nextHearing);
+                return toDateValue(a.nextHearing) - toDateValue(b.nextHearing);
             });
 
             renderTable(filtered);
@@ -432,7 +434,34 @@
             }, 3000);
         }
 
-        applyFilters();
+        async function loadCases() {
+            try {
+                const role = localStorage.getItem('userRole');
+                const userId = localStorage.getItem('userId');
+                const params = new URLSearchParams();
+                if (role) params.append('role', role);
+                if (userId) params.append('userId', userId);
+                const response = await fetch(`/api/cases?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load cases');
+                }
+                const data = await response.json();
+                cases = data.map(item => ({
+                    caseNumber: item.caseNumber,
+                    title: item.title,
+                    advocate: item.advocate,
+                    status: item.status,
+                    nextHearing: item.nextHearing
+                }));
+                applyFilters();
+            } catch (error) {
+                console.error(error);
+                showToast('Unable to load cases', 'error');
+                applyFilters();
+            }
+        }
+
+        loadCases();
     </script>
 </body>
 </html>

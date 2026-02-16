@@ -346,22 +346,15 @@
     </div>
 
     <script>
-        const cases = [
-            { id: "LC-2026-001", title: "Rao vs. Mehta", client: "Ananya Rao", advocate: "Adv. S. Verma", category: "Civil", status: "Active", priority: "High", nextHearing: "2026-02-12", overdueTasks: 2 },
-            { id: "LC-2026-002", title: "State vs. Iqbal", client: "Govt. of Maharashtra", advocate: "Adv. K. Singh", category: "Criminal", status: "Pending", priority: "High", nextHearing: "2026-02-18", overdueTasks: 0 },
-            { id: "LC-2026-003", title: "Skyline Builders Contract", client: "Skyline Builders", advocate: "Adv. A. Patel", category: "Corporate", status: "Active", priority: "Medium", nextHearing: "2026-03-03", overdueTasks: 1 },
-            { id: "LC-2026-004", title: "Nair Divorce Settlement", client: "Riya Nair", advocate: "Adv. M. Joseph", category: "Family", status: "Escalated", priority: "High", nextHearing: "2026-02-10", overdueTasks: 3 },
-            { id: "LC-2026-005", title: "Verma Property Dispute", client: "Arjun Verma", advocate: "Adv. T. Roy", category: "Property", status: "Active", priority: "Medium", nextHearing: "2026-02-22", overdueTasks: 0 },
-            { id: "LC-2026-006", title: "GreenTech Compliance", client: "GreenTech Ltd.", advocate: "Adv. P. Desai", category: "Corporate", status: "Pending", priority: "Low", nextHearing: "2026-03-12", overdueTasks: 0 },
-            { id: "LC-2026-007", title: "Singh Inheritance Case", client: "Raj Singh", advocate: "Adv. L. Bose", category: "Family", status: "Closed", priority: "Low", nextHearing: "2026-01-15", overdueTasks: 0 },
-            { id: "LC-2026-008", title: "Urban Housing Appeal", client: "Urban Housing Board", advocate: "Adv. N. Kulkarni", category: "Civil", status: "Active", priority: "Medium", nextHearing: "2026-02-28", overdueTasks: 0 }
-        ];
+        let cases = [];
 
         const priorityRank = { High: 1, Medium: 2, Low: 3 };
         const statusRank = { Escalated: 1, Active: 2, Pending: 3, Closed: 4 };
 
         function formatDate(dateStr) {
+            if (!dateStr) return "N/A";
             const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "N/A";
             return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
         }
 
@@ -402,7 +395,7 @@
             list.forEach(item => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${item.id}</td>
+                    <td>${item.caseNumber}</td>
                     <td>${item.title}</td>
                     <td>${item.client}</td>
                     <td>${item.advocate}</td>
@@ -412,13 +405,18 @@
                     <td>${formatDate(item.nextHearing)}</td>
                     <td>
                         <div class="table-actions">
-                            <button class="btn btn-outline btn-sm" onclick="viewCase('${item.id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-primary btn-sm" onclick="editCase('${item.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-outline btn-sm" onclick="viewCase('${item.caseNumber}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-primary btn-sm" onclick="editCase('${item.caseNumber}')"><i class="fas fa-pen"></i></button>
                         </div>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        function toDateValue(dateStr) {
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? Number.MAX_SAFE_INTEGER : date.getTime();
         }
 
         function applyFilters() {
@@ -429,7 +427,7 @@
             const sort = document.getElementById("sortFilter").value;
 
             let filtered = cases.filter(c => {
-                const matchesQuery = [c.id, c.title, c.client, c.advocate]
+                const matchesQuery = [c.caseNumber, c.title, c.client, c.advocate]
                     .some(field => field.toLowerCase().includes(query));
                 const matchesStatus = status ? c.status === status : true;
                 const matchesPriority = priority ? c.priority === priority : true;
@@ -441,7 +439,7 @@
                 if (sort === "priority") return priorityRank[a.priority] - priorityRank[b.priority];
                 if (sort === "status") return statusRank[a.status] - statusRank[b.status];
                 if (sort === "client") return a.client.localeCompare(b.client);
-                return new Date(a.nextHearing) - new Date(b.nextHearing);
+                return toDateValue(a.nextHearing) - toDateValue(b.nextHearing);
             });
 
             renderTable(filtered);
@@ -485,7 +483,38 @@
             }, 3000);
         }
 
-        applyFilters();
+        async function loadCases() {
+            try {
+                const role = localStorage.getItem('userRole');
+                const userId = localStorage.getItem('userId');
+                const params = new URLSearchParams();
+                if (role) params.append('role', role);
+                if (userId) params.append('userId', userId);
+                const response = await fetch(`/api/cases?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load cases');
+                }
+                const data = await response.json();
+                cases = data.map(item => ({
+                    caseNumber: item.caseNumber,
+                    title: item.title,
+                    client: item.client,
+                    advocate: item.advocate,
+                    category: item.category,
+                    status: item.status,
+                    priority: item.priority,
+                    nextHearing: item.nextHearing,
+                    overdueTasks: item.overdueTasks || 0
+                }));
+                applyFilters();
+            } catch (error) {
+                console.error(error);
+                showToast('Unable to load cases', 'error');
+                applyFilters();
+            }
+        }
+
+        loadCases();
     </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 package com.legal.casemanagement.service;
 
-import com.legal.casemanagement.dto.LoginRequest;
-import com.legal.casemanagement.dto.LoginResponse;
+import com.legal.casemanagement.dto.AuthDtos.LoginRequest;
+import com.legal.casemanagement.dto.AuthDtos.LoginResponse;
 import com.legal.casemanagement.entity.User;
 import com.legal.casemanagement.repository.UserRepository;
 import com.legal.casemanagement.util.JwtUtil;

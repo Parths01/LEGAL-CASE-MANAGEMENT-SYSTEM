@@ -243,6 +243,27 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_due_date (due_date)
 ) ENGINE=InnoDB;
 
+-- Messages Table
+CREATE TABLE IF NOT EXISTS messages (
+    message_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    case_id BIGINT NOT NULL,
+    sender_id BIGINT NOT NULL,
+    recipient_id BIGINT NOT NULL,
+    subject VARCHAR(300),
+    message_text TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP NULL,
+    FOREIGN KEY (case_id) REFERENCES cases(case_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    INDEX idx_case_id (case_id),
+    INDEX idx_sender_id (sender_id),
+    INDEX idx_recipient_id (recipient_id),
+    INDEX idx_is_read (is_read),
+    INDEX idx_sent_at (sent_at)
+) ENGINE=InnoDB;
+
 -- Set AUTO_INCREMENT values
 ALTER TABLE users AUTO_INCREMENT = 1001;
 ALTER TABLE law_firms AUTO_INCREMENT = 2001;
@@ -257,3 +278,4 @@ ALTER TABLE legal_notices AUTO_INCREMENT = 10001;
 ALTER TABLE audit_logs AUTO_INCREMENT = 11001;
 ALTER TABLE case_notes AUTO_INCREMENT = 12001;
 ALTER TABLE tasks AUTO_INCREMENT = 13001;
+ALTER TABLE messages AUTO_INCREMENT = 14001;

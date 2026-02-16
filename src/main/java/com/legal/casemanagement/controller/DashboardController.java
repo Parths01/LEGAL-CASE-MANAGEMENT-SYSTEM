@@ -1,9 +1,9 @@
 package com.legal.casemanagement.controller;
 
-import com.legal.casemanagement.dto.AdminDashboardSummary;
-import com.legal.casemanagement.dto.AdvocateDashboardSummary;
-import com.legal.casemanagement.dto.ClientDashboardSummary;
-import com.legal.casemanagement.dto.ClerkDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.AdminDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.AdvocateDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.ClientDashboardSummary;
+import com.legal.casemanagement.dto.DashboardDtos.ClerkDashboardSummary;
 import com.legal.casemanagement.service.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
