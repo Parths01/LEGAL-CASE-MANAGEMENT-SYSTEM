@@ -23,6 +23,7 @@
             { label: 'Messages', icon: 'fas fa-comments', href: '/messages.html' },
             { label: 'Reports', icon: 'fas fa-chart-bar', href: '/reports.html' },
             { label: 'User Management', icon: 'fas fa-users', href: '/user-management.html' },
+            { label: 'My Profile', icon: 'fas fa-id-badge', href: '/profile.html' },
         ],
         ADVOCATE: [
             { label: 'Dashboard', icon: 'fas fa-tachometer-alt', href: '/advocate-dashboard.html' },
@@ -30,6 +31,7 @@
             { label: 'Hearings', icon: 'fas fa-calendar-alt', href: '/hearings.html' },
             { label: 'Tasks', icon: 'fas fa-tasks', href: '/tasks.html' },
             { label: 'Messages', icon: 'fas fa-comments', href: '/messages.html' },
+            { label: 'My Profile', icon: 'fas fa-id-badge', href: '/profile.html' },
         ],
         CLERK: [
             { label: 'Dashboard', icon: 'fas fa-tachometer-alt', href: '/clerk-dashboard.html' },
@@ -38,12 +40,14 @@
             { label: 'Tasks', icon: 'fas fa-tasks', href: '/tasks.html' },
             { label: 'Legal Notices', icon: 'fas fa-envelope-open-text', href: '/notices.html' },
             { label: 'Messages', icon: 'fas fa-comments', href: '/messages.html' },
+            { label: 'My Profile', icon: 'fas fa-id-badge', href: '/profile.html' },
         ],
         CLIENT: [
             { label: 'Dashboard', icon: 'fas fa-tachometer-alt', href: '/client-dashboard.html' },
             { label: 'My Cases', icon: 'fas fa-gavel', href: '/cases.html' },
             { label: 'Invoices', icon: 'fas fa-file-invoice-dollar', href: '/invoices.html' },
             { label: 'Messages', icon: 'fas fa-comments', href: '/messages.html' },
+            { label: 'My Profile', icon: 'fas fa-id-badge', href: '/profile.html' },
         ],
     };
 

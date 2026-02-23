@@ -59,7 +59,7 @@ public class SecurityConfig {
                                                                 "/client-details.html", "/hearings.html",
                                                                 "/tasks.html", "/invoices.html",
                                                                 "/notices.html", "/messages.html",
-                                                                "/reports.html")
+                                                                "/reports.html", "/profile.html")
                                                 .permitAll()
 
                                                 // Static assets
