@@ -12,6 +12,7 @@ import com.legal.casemanagement.dto.CaseDtos.UpdateCaseRequest;
 import com.legal.casemanagement.dto.CaseDtos.UpdateTaskStatusRequest;
 import com.legal.casemanagement.dto.CaseDtos.CreateCaseRequest;
 import com.legal.casemanagement.dto.CaseDtos.CreateCaseResponse;
+import com.legal.casemanagement.dto.CaseDtos.AdvocateOption;
 import com.legal.casemanagement.dto.CaseDtos.UploadDocumentRequest;
 import com.legal.casemanagement.dto.CaseDtos.DocumentResponse;
 import com.legal.casemanagement.dto.CaseDtos.ScheduleHearingRequest;
@@ -51,15 +52,16 @@ public class CaseService {
                 "SELECT c.case_number, c.case_title, c.case_type, c.status, c.priority, " +
                         "cu.name AS client_name, au.name AS advocate_name, " +
                         "(SELECT MIN(h.hearing_date) FROM hearings h " +
-                        " WHERE h.case_id = c.case_id AND h.status = 'SCHEDULED' AND h.hearing_date >= NOW()) AS next_hearing, " +
+                        " WHERE h.case_id = c.case_id AND h.status = 'SCHEDULED' AND h.hearing_date >= NOW()) AS next_hearing, "
+                        +
                         "(SELECT COUNT(*) FROM tasks t " +
-                        " WHERE t.case_id = c.case_id AND t.status IN ('PENDING','IN_PROGRESS') AND t.due_date < NOW()) AS overdue_tasks " +
+                        " WHERE t.case_id = c.case_id AND t.status IN ('PENDING','IN_PROGRESS') AND t.due_date < NOW()) AS overdue_tasks "
+                        +
                         "FROM cases c " +
                         "JOIN clients cl ON c.client_id = cl.client_id " +
                         "JOIN users cu ON cl.user_id = cu.user_id " +
                         "JOIN advocates a ON c.advocate_id = a.advocate_id " +
-                        "JOIN users au ON a.user_id = au.user_id "
-        );
+                        "JOIN users au ON a.user_id = au.user_id ");
 
         List<Object> params = new ArrayList<>();
         String roleUpper = role == null ? "" : role.trim().toUpperCase(Locale.ROOT);
@@ -74,17 +76,19 @@ public class CaseService {
         }
         sql.append(" ORDER BY c.created_at DESC");
 
-        return jdbcTemplate.query(sql.toString(), params.toArray(), (rs, rowNum) -> CaseListItem.builder()
-                .caseNumber(rs.getString("case_number"))
-                .title(rs.getString("case_title"))
-                .client(rs.getString("client_name"))
-                .advocate(rs.getString("advocate_name"))
-                .category(mapCaseType(rs.getString("case_type")))
-                .status(mapCaseStatus(rs.getString("status")))
-                .priority(mapPriority(rs.getString("priority")))
-                .nextHearing(formatDate(rs.getTimestamp("next_hearing")))
-                .overdueTasks(Optional.ofNullable(rs.getLong("overdue_tasks")).orElse(0L))
-                .build());
+        return jdbcTemplate.query(sql.toString(),
+                (rs, rowNum) -> CaseListItem.builder()
+                        .caseNumber(rs.getString("case_number"))
+                        .title(rs.getString("case_title"))
+                        .client(rs.getString("client_name"))
+                        .advocate(rs.getString("advocate_name"))
+                        .category(mapCaseType(rs.getString("case_type")))
+                        .status(mapCaseStatus(rs.getString("status")))
+                        .priority(mapPriority(rs.getString("priority")))
+                        .nextHearing(formatDate(rs.getTimestamp("next_hearing")))
+                        .overdueTasks(Optional.ofNullable(rs.getLong("overdue_tasks")).orElse(0L))
+                        .build(),
+                params.toArray());
     }
 
     // Overload for backward compatibility
@@ -95,38 +99,31 @@ public class CaseService {
     public CaseDetail getCaseDetail(@NonNull String caseNumber, String role, Long userId) {
         StringBuilder sqlBuilder = new StringBuilder(
                 "SELECT c.case_id, c.case_number, c.case_title, c.case_type, c.status, c.priority, " +
-                "c.filing_date, c.court_name, c.judge_name, c.description, c.opposing_party, " +
-                "cu.name AS client_name, au.name AS advocate_name " +
-                "FROM cases c " +
-                "LEFT JOIN clients cl ON c.client_id = cl.client_id " +
-                "LEFT JOIN users cu ON cl.user_id = cu.user_id " +
-                "LEFT JOIN advocates a ON c.advocate_id = a.advocate_id " +
-                "LEFT JOIN users au ON a.user_id = au.user_id " +
-                "WHERE c.case_number = ?"
-        );
-        
-        // Apply user-based access control - only for non-admin users
+                        "c.filing_date, c.court_name, c.judge_name, c.description, c.opposing_party, " +
+                        "cu.name AS client_name, au.name AS advocate_name " +
+                        "FROM cases c " +
+                        "LEFT JOIN clients cl ON c.client_id = cl.client_id " +
+                        "LEFT JOIN users cu ON cl.user_id = cu.user_id " +
+                        "LEFT JOIN advocates a ON c.advocate_id = a.advocate_id " +
+                        "LEFT JOIN users au ON a.user_id = au.user_id " +
+                        "WHERE c.case_number = ?");
+
+        List<Object> params = new ArrayList<>();
+        params.add(caseNumber);
         String roleUpper = role == null ? "" : role.trim().toUpperCase(Locale.ROOT);
-        System.out.println("DEBUG getCaseDetail - Role: '" + role + "', RoleUpper: '" + roleUpper + "', UserId: " + userId);
-        
-        // ADMIN users can see all cases, others are restricted
-        if (!"ADMIN".equals(roleUpper) && userId != null) {
-            System.out.println("DEBUG: Applying access restrictions for role: " + roleUpper);
-            sqlBuilder.append(" AND (");
-            if ("ADVOCATE".equals(roleUpper) || "CLERK".equals(roleUpper)) {
-                // Advocates and clerks can only see cases assigned to them
-                sqlBuilder.append("a.user_id = ").append(userId);
+
+        // Apply user-based access control for scoped roles.
+        if (userId != null) {
+            if ("ADVOCATE".equals(roleUpper)) {
+                sqlBuilder.append(" AND a.user_id = ?");
+                params.add(userId);
             } else if ("CLIENT".equals(roleUpper)) {
-                // Clients can only see their own cases
-                sqlBuilder.append("cu.user_id = ").append(userId);
+                sqlBuilder.append(" AND cu.user_id = ?");
+                params.add(userId);
             }
-            sqlBuilder.append(")");
-        } else {
-            System.out.println("DEBUG: No restrictions applied for role: " + roleUpper);
         }
-        
+
         String sql = sqlBuilder.toString();
-        System.out.println("DEBUG SQL: " + sql);
 
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next()) {
@@ -156,7 +153,7 @@ public class CaseService {
                     .build();
 
             return detail;
-        }, caseNumber);
+        }, params.toArray());
     }
 
     public boolean updateCase(@NonNull String caseNumber, UpdateCaseRequest request) {
@@ -173,8 +170,7 @@ public class CaseService {
                 request.getDescription(),
                 request.getCourt(),
                 request.getJudge(),
-                caseNumber
-        );
+                caseNumber);
 
         return updated > 0;
     }
@@ -302,12 +298,14 @@ public class CaseService {
     }
 
     private Long getCaseId(String caseNumber) {
-        List<Long> ids = jdbcTemplate.query("SELECT case_id FROM cases WHERE case_number = ?", (rs, rowNum) -> rs.getLong("case_id"), caseNumber);
+        List<Long> ids = jdbcTemplate.query("SELECT case_id FROM cases WHERE case_number = ?",
+                (rs, rowNum) -> rs.getLong("case_id"), caseNumber);
         return ids.isEmpty() ? null : ids.get(0);
     }
 
     private Long getFallbackUserId() {
-        List<Long> ids = jdbcTemplate.query("SELECT user_id FROM users ORDER BY user_id LIMIT 1", (rs, rowNum) -> rs.getLong("user_id"));
+        List<Long> ids = jdbcTemplate.query("SELECT user_id FROM users ORDER BY user_id LIMIT 1",
+                (rs, rowNum) -> rs.getLong("user_id"));
         return ids.isEmpty() ? null : ids.get(0);
     }
 
@@ -467,8 +465,16 @@ public class CaseService {
     }
 
     public CreateCaseResponse createCase(CreateCaseRequest request) {
-        if (request == null || request.getCaseTitle() == null || request.getClientId() == null 
+        if (request == null || request.getCaseTitle() == null || request.getClientId() == null
                 || request.getAdvocateUserId() == null) {
+            return null;
+        }
+        if (!isClientPresent(request.getClientId())) {
+            return null;
+        }
+
+        Long advocateId = getAdvocateIdByUserId(request.getAdvocateUserId());
+        if (advocateId == null) {
             return null;
         }
 
@@ -482,7 +488,7 @@ public class CaseService {
         params.put("case_title", request.getCaseTitle());
         params.put("case_type", request.getCaseType() != null ? request.getCaseType() : "OTHER");
         params.put("client_id", request.getClientId());
-        params.put("advocate_id", getAdvocateIdByUserId(request.getAdvocateUserId()));
+        params.put("advocate_id", advocateId);
         params.put("court_name", request.getCourtName());
         params.put("court_type", request.getCourtType());
         params.put("filing_date", request.getFilingDate());
@@ -501,11 +507,14 @@ public class CaseService {
     }
 
     private String generateCaseNumber() {
-        String prefix = "LC-2026-";
+        String year = String.valueOf(LocalDate.now().getYear());
+        String prefix = "LC-" + year + "-";
+        int suffixStart = prefix.length() + 1;
         Integer max = jdbcTemplate.queryForObject(
-                "SELECT COALESCE(MAX(CAST(SUBSTRING(case_number, 9) AS UNSIGNED)), 0) FROM cases WHERE case_number LIKE 'LC-2026-%'",
-                Integer.class
-        );
+                "SELECT COALESCE(MAX(CAST(SUBSTRING(case_number, " + suffixStart + ") AS UNSIGNED)), 0) " +
+                        "FROM cases WHERE case_number LIKE ?",
+                Integer.class,
+                prefix + "%");
         int nextNum = (max != null ? max : 0) + 1;
         return prefix + String.format("%03d", nextNum);
     }
@@ -514,31 +523,54 @@ public class CaseService {
         List<Long> ids = jdbcTemplate.query(
                 "SELECT advocate_id FROM advocates WHERE user_id = ? LIMIT 1",
                 (rs, rowNum) -> rs.getLong("advocate_id"),
-                userId
-        );
-        return ids.isEmpty() ? 1L : ids.get(0);
+                userId);
+        return ids.isEmpty() ? null : ids.get(0);
+    }
+
+    private boolean isClientPresent(Long clientId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM clients WHERE client_id = ?",
+                Integer.class,
+                clientId);
+        return count != null && count > 0;
+    }
+
+    public List<AdvocateOption> getAssignableAdvocates() {
+        String sql = "SELECT a.advocate_id, a.user_id, u.name, a.specialization " +
+                "FROM advocates a " +
+                "JOIN users u ON u.user_id = a.user_id " +
+                "WHERE u.role = 'ADVOCATE' AND u.status = 'ACTIVE' " +
+                "ORDER BY u.name ASC";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> AdvocateOption.builder()
+                .advocateId(rs.getLong("advocate_id"))
+                .advocateUserId(rs.getLong("user_id"))
+                .name(rs.getString("name"))
+                .specialization(rs.getString("specialization"))
+                .build());
     }
 
     public DocumentResponse uploadDocument(UploadDocumentRequest request, Long uploadedByUserId) {
         try {
+            if (request == null || request.getDocumentName() == null || request.getDocumentName().isBlank()) {
+                return null;
+            }
             Long caseId = request.getCaseId();
-            
+
             // If caseId is not provided but caseNumber is, resolve it
             if (caseId == null && request.getCaseNumber() != null) {
                 List<Long> ids = jdbcTemplate.query(
                         "SELECT case_id FROM cases WHERE case_number = ? LIMIT 1",
                         (rs, rowNum) -> rs.getLong("case_id"),
-                        request.getCaseNumber()
-                );
+                        request.getCaseNumber());
                 if (!ids.isEmpty()) {
                     caseId = ids.get(0);
                 }
             }
-            
+
             if (caseId == null) {
                 return null;
             }
-            
+
             SimpleJdbcInsert documentInsert = new SimpleJdbcInsert(jdbcTemplate)
                     .withTableName("documents")
                     .usingGeneratedKeyColumns("document_id");
@@ -565,13 +597,19 @@ public class CaseService {
 
     public HearingResponse scheduleHearing(ScheduleHearingRequest request) {
         try {
+            if (request == null || request.getHearingDate() == null || request.getHearingTime() == null) {
+                return null;
+            }
             // Resolve caseNumber to caseId if caseNumber is provided
             Long caseId = request.getCaseId();
             if (caseId == null && request.getCaseNumber() != null) {
                 String sql = "SELECT case_id FROM cases WHERE case_number = ?";
                 caseId = jdbcTemplate.queryForObject(sql, Long.class, request.getCaseNumber());
             }
-            
+            if (caseId == null) {
+                return null;
+            }
+
             SimpleJdbcInsert hearingInsert = new SimpleJdbcInsert(jdbcTemplate)
                     .withTableName("hearings")
                     .usingGeneratedKeyColumns("hearing_id");
@@ -598,6 +636,10 @@ public class CaseService {
 
     public MessageResponse sendMessage(SendMessageRequest request, Long senderId) {
         try {
+            if (request == null || request.getCaseId() == null || request.getRecipientId() == null
+                    || request.getMessageText() == null || request.getMessageText().isBlank()) {
+                return null;
+            }
             SimpleJdbcInsert messageInsert = new SimpleJdbcInsert(jdbcTemplate)
                     .withTableName("messages")
                     .usingGeneratedKeyColumns("message_id");

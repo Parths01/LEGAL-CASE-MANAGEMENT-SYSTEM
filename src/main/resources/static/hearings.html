@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hearings - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <h2>Hearings</h2>
+                <p>Track all court hearings, update statuses, and record next dates.</p>
+            </div>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Total</div>
+                    <div class="kpi-val" id="kpiTotal">-</div>
+                </div>
+                <div class="kpi-icon blue"><i class="fas fa-calendar"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Scheduled</div>
+                    <div class="kpi-val" id="kpiScheduled">-</div>
+                </div>
+                <div class="kpi-icon orange"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Completed</div>
+                    <div class="kpi-val" id="kpiCompleted">-</div>
+                </div>
+                <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Postponed</div>
+                    <div class="kpi-val" id="kpiPostponed">-</div>
+                </div>
+                <div class="kpi-icon purple"><i class="fas fa-redo"></i></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="Search case number, type, courtroom..."
+                oninput="filterTable()">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="">All Statuses</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="POSTPONED">Postponed</option>
+                <option value="CANCELLED">Cancelled</option>
+            </select>
+            <button class="btn btn-outline" onclick="loadHearings()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case #</th>
+                        <th>Case Title</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Courtroom</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="hearingsBody">
+                    <tr>
+                        <td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-edit"></i> Update Hearing Status</h3>
+            <p style="color:var(--muted);margin-bottom:16px;" id="statusModalDesc"></p>
+            <div class="form-group">
+                <label>New Status</label>
+                <select id="newStatus">
+                    <option value="SCHEDULED">Scheduled</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="POSTPONED">Postponed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Remarks</label>
+                <textarea id="hearingRemarks" rows="2" placeholder="Optional remarks..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Next Hearing Date (if rescheduled)</label>
+                <input id="nextHearingDate" type="date">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitUpdate()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allHearings = [], currentId = null;
+
+        function initPage() {
+            // Auth check handled by sidebar.js – just load data
+            loadHearings();
+        }
+
+        async function loadHearings() {
+            document.getElementById('hearingsBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr>';
+            try {
+                const res = await fetch('/api/hearings');
+                if (!res.ok) throw 0;
+                allHearings = await res.json();
+                updateKPIs();
+                renderTable(allHearings);
+            } catch (e) {
+                document.getElementById('hearingsBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Failed to load hearings.</td></tr>';
+            }
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpiTotal').textContent = allHearings.length;
+            document.getElementById('kpiScheduled').textContent = allHearings.filter(h => h.status === 'SCHEDULED').length;
+            document.getElementById('kpiCompleted').textContent = allHearings.filter(h => h.status === 'COMPLETED').length;
+            document.getElementById('kpiPostponed').textContent = allHearings.filter(h => h.status === 'POSTPONED').length;
+        }
+
+        function bc(s) { return { SCHEDULED: 'b-sched', COMPLETED: 'b-done', POSTPONED: 'b-post', CANCELLED: 'b-cancel' }[s] || 'b-sched'; }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('hearingsBody');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-calendar-times"></i>No hearings found</div></td></tr>'; return; }
+            tbody.innerHTML = data.map(h => `
+        <tr>
+            <td><strong>${esc(h.caseNumber)}</strong></td>
+            <td>${esc(h.caseTitle)}</td>
+            <td>${esc(h.hearingDate)}</td>
+            <td>${esc(h.hearingTime)}</td>
+            <td>${esc(h.hearingType)}</td>
+            <td>${esc(h.courtroom)}</td>
+            <td><span class="badge ${bc(h.status)}">${esc(h.status)}</span></td>
+            <td><button class="btn btn-sm btn-outline" onclick="openModal(${h.hearingId},'${esc(h.caseNumber)}')"><i class="fas fa-edit"></i> Update</button></td>
+        </tr>`).join('');
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const s = document.getElementById('statusFilter').value;
+            renderTable(allHearings.filter(h => {
+                const m = !q || (h.caseNumber || '').toLowerCase().includes(q) || (h.hearingType || '').toLowerCase().includes(q) || (h.courtroom || '').toLowerCase().includes(q);
+                return m && (!s || h.status === s);
+            }));
+        }
+
+        function openModal(id, caseNo) { currentId = id; document.getElementById('statusModalDesc').textContent = `Case: ${caseNo}`; document.getElementById('hearingRemarks').value = ''; document.getElementById('nextHearingDate').value = ''; document.getElementById('statusModal').classList.add('open'); }
+        function closeModal() { document.getElementById('statusModal').classList.remove('open'); currentId = null; }
+
+        async function submitUpdate() {
+            if (!currentId) return;
+            try {
+                await fetch(`/api/hearings/${currentId}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: document.getElementById('newStatus').value, remarks: document.getElementById('hearingRemarks').value, nextHearingDate: document.getElementById('nextHearingDate').value || null }) });
+                closeModal(); loadHearings();
+            } catch (e) { alert('Failed to update.'); }
+        }
+
+        function esc(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+        window.addEventListener('load', loadHearings);
+    </script>
+    <script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>

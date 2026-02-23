@@ -1,0 +1,5 @@
+com/legal/casemanagement/controller/UserControllerTest.class
+com/legal/casemanagement/ApplicationContextTest.class
+com/legal/casemanagement/service/AuthServiceTest.class
+com/legal/casemanagement/service/TaskServiceTest.class
+com/legal/casemanagement/controller/AuthControllerTest.class

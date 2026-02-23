@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ── Chat Layout ─────────────────────────────────────── */
+        .chat-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: calc(100vh - 64px);
+            gap: 0;
+            background: var(--clr-bg);
+        }
+
+        /* ── Contacts Pane ───────────────────────────────────── */
+        .contacts-pane {
+            background: white;
+            border-right: 1px solid var(--clr-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .contacts-header {
+            padding: 20px 18px 14px;
+            border-bottom: 1px solid var(--clr-border);
+            background: white;
+        }
+
+        .contacts-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .contacts-search {
+            position: relative;
+        }
+
+        .contacts-search input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1.5px solid var(--clr-border);
+            border-radius: var(--r-full);
+            font-size: .84rem;
+            font-family: inherit;
+            outline: none;
+            background: #f8fafc;
+            transition: border-color .15s;
+        }
+
+        .contacts-search input:focus {
+            border-color: var(--clr-accent);
+            background: white;
+        }
+
+        .contacts-search i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--clr-muted);
+            font-size: .8rem;
+        }
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: background .12s;
+            border-left: 3px solid transparent;
+        }
+
+        .contact-item:hover {
+            background: #f8fafc;
+        }
+
+        .contact-item.active {
+            background: #eff6ff;
+            border-left-color: var(--clr-accent);
+        }
+
+        .contact-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .95rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .av-admin {
+            background: #dc3545;
+        }
+
+        .av-advocate {
+            background: #7c3aed;
+        }
+
+        .av-client {
+            background: #16a34a;
+        }
+
+        .av-clerk {
+            background: #f59e0b;
+        }
+
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .contact-name {
+            font-size: .9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-preview {
+            font-size: .76rem;
+            color: var(--clr-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .contact-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .contact-time {
+            font-size: .72rem;
+            color: var(--clr-muted);
+        }
+
+        .contact-badge {
+            background: var(--clr-accent);
+            color: white;
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: var(--r-full);
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .role-chip {
+            font-size: .65rem;
+            font-weight: 600;
+            padding: 1px 7px;
+            border-radius: var(--r-full);
+            letter-spacing: .03em;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .rc-admin {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .rc-advocate {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .rc-client {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .rc-clerk {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* ── Thread Pane ─────────────────────────────────────── */
+        .thread-pane {
+            display: flex;
+            flex-direction: column;
+            background: #f0f4f8;
+            overflow: hidden;
+        }
+
+        .thread-header {
+            background: white;
+            padding: 14px 22px;
+            border-bottom: 1px solid var(--clr-border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .04);
+        }
+
+        .thread-header-info {
+            flex: 1;
+        }
+
+        .thread-header-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .thread-header-role {
+            font-size: .78rem;
+            color: var(--clr-muted);
+            margin-top: 1px;
+        }
+
+        .thread-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--clr-muted);
+            gap: 12px;
+        }
+
+        .thread-empty i {
+            font-size: 3rem;
+            opacity: .2;
+        }
+
+        .thread-empty p {
+            font-size: .95rem;
+        }
+
+        .thread-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bubble-wrap {
+            display: flex;
+            flex-direction: column;
+            max-width: 72%;
+        }
+
+        .bubble-wrap.mine {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .bubble-wrap.theirs {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .bubble {
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: .88rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .bubble.mine {
+            background: var(--clr-accent);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bubble.theirs {
+            background: white;
+            color: var(--clr-text);
+            border-bottom-left-radius: 5px;
+            box-shadow: var(--sh-sm);
+        }
+
+        .bubble-time {
+            font-size: .69rem;
+            color: var(--clr-muted);
+            margin-top: 3px;
+            padding: 0 4px;
+        }
+
+        .date-divider {
+            text-align: center;
+            font-size: .72rem;
+            color: var(--clr-muted);
+            margin: 8px 0;
+            position: relative;
+        }
+
+        .date-divider span {
+            background: #f0f4f8;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .date-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            border-top: 1px solid var(--clr-border);
+        }
+
+        /* ── Compose Bar ─────────────────────────────────────── */
+        .compose-bar {
+            background: white;
+            border-top: 1px solid var(--clr-border);
+            padding: 14px 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .compose-bar textarea {
+            flex: 1;
+            border: 1.5px solid var(--clr-border);
+            border-radius: 22px;
+            padding: 10px 16px;
+            font-size: .88rem;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            min-height: 42px;
+            line-height: 1.4;
+            transition: border-color .15s;
+        }
+
+        .compose-bar textarea:focus {
+            border-color: var(--clr-accent);
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--clr-accent);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background .15s, transform .1s;
+        }
+
+        .send-btn:hover {
+            background: var(--clr-accent-hov);
+            transform: scale(1.07);
+        }
+
+        .send-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .contacts-pane {
+                display: none;
+            }
+
+            .contacts-pane.show-mobile {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <div class="chat-wrapper">
+
+            <!-- ── Contacts Pane ─────────────────────────────── -->
+            <div class="contacts-pane" id="contactsPane">
+                <div class="contacts-header">
+                    <h2><i class="fas fa-comments" style="color:var(--clr-accent);margin-right:8px"></i>Messages</h2>
+                    <div class="contacts-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="contactSearch" placeholder="Search people…" oninput="filterContacts()">
+                    </div>
+                </div>
+                <div class="contacts-list" id="contactsList">
+                    <div style="padding:30px;text-align:center;color:var(--clr-muted)">
+                        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:8px;display:block"></i>
+                        Loading contacts…
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Thread Pane ───────────────────────────────── -->
+            <div class="thread-pane" id="threadPane">
+                <!-- Header (hidden until contact selected) -->
+                <div class="thread-header" id="threadHeader" style="display:none">
+                    <div class="contact-avatar" id="threadAvatar"></div>
+                    <div class="thread-header-info">
+                        <div class="thread-header-name" id="threadName"></div>
+                        <div class="thread-header-role" id="threadRole"></div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="thread-empty" id="threadEmpty">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>Select a contact to start chatting</p>
+                </div>
+
+                <!-- Messages -->
+                <div class="thread-messages" id="threadMessages" style="display:none"></div>
+
+                <!-- Compose -->
+                <div class="compose-bar" id="composeBar" style="display:none">
+                    <textarea id="msgInput" placeholder="Type a message…" rows="1" oninput="autoResize(this)"
+                        onkeydown="handleKey(event)"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── State ────────────────────────────────────────
+        let ME = null;        // { userId, role, name }
+        let contacts = [];    // all contacts from API
+        let activeContact = null;
+        let pollTimer = null;
+
+        // ── Init ─────────────────────────────────────────
+        function initPage() {
+            const userId = localStorage.getItem('userId');
+            const role = (localStorage.getItem('userRole') || '').toUpperCase();
+            const name = localStorage.getItem('userName') || 'Me';
+            if (!userId || !role) { window.location.href = '/login.html'; return; }
+            ME = { userId: parseInt(userId), role, name };
+            loadContacts();
+        }
+
+        // ── Contacts ─────────────────────────────────────
+        async function loadContacts() {
+            try {
+                const res = await fetch(`/api/messages/contacts?userId=${ME.userId}&role=${ME.role}`);
+                if (!res.ok) throw new Error('Failed');
+                contacts = await res.json();
+                renderContacts(contacts);
+            } catch (e) {
+                document.getElementById('contactsList').innerHTML =
+                    '<div style="padding:20px;text-align:center;color:var(--clr-muted)">Could not load contacts</div>';
+            }
+        }
+
+        function renderContacts(list) {
+            const el = document.getElementById('contactsList');
+            if (!list.length) {
+                el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--clr-muted)">No contacts available</div>';
+                return;
+            }
+            el.innerHTML = list.map(c => {
+                const initials = c.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                const roleLow = (c.role || '').toLowerCase();
+                const isActive = activeContact && activeContact.userId === c.userId;
+                return `
+            <div class="contact-item${isActive ? ' active' : ''}" id="ci-${c.userId}" onclick="selectContact(${c.userId})">
+                <div class="contact-avatar av-${roleLow}">${esc(initials)}</div>
+                <div class="contact-info">
+                    <div class="contact-name">${esc(c.name)}</div>
+                    <div class="contact-preview">${esc(c.lastMessage || 'No messages yet')}</div>
+                </div>
+                <div class="contact-meta">
+                    <div class="contact-time">${esc(c.lastMessageAt || '')}</div>
+                    ${c.unreadCount > 0 ? `<div class="contact-badge">${c.unreadCount}</div>` : ''}
+                    <span class="role-chip rc-${roleLow}">${esc(c.role)}</span>
+                </div>
+            </div>`;
+            }).join('');
+        }
+
+        function filterContacts() {
+            const q = document.getElementById('contactSearch').value.toLowerCase();
+            const filtered = q ? contacts.filter(c => c.name.toLowerCase().includes(q)) : contacts;
+            renderContacts(filtered);
+        }
+
+        // ── Select Contact → Load Thread ─────────────────
+        async function selectContact(userId) {
+            activeContact = contacts.find(c => c.userId === userId);
+            if (!activeContact) return;
+
+            // Update UI
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            const ci = document.getElementById(`ci-${userId}`);
+            if (ci) ci.classList.add('active');
+
+            const roleLow = (activeContact.role || '').toLowerCase();
+            const initials = activeContact.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+            document.getElementById('threadHeader').style.display = 'flex';
+            document.getElementById('threadAvatar').className = `contact-avatar av-${roleLow}`;
+            document.getElementById('threadAvatar').textContent = initials;
+            document.getElementById('threadName').textContent = activeContact.name;
+            document.getElementById('threadRole').textContent = activeContact.role;
+            document.getElementById('threadEmpty').style.display = 'none';
+            document.getElementById('threadMessages').style.display = 'flex';
+            document.getElementById('composeBar').style.display = 'flex';
+
+            await loadThread();
+
+            // Clear unread badge for this contact
+            activeContact.unreadCount = 0;
+            renderContacts(contacts);
+
+            // Start polling for new messages every 5s
+            if (pollTimer) clearInterval(pollTimer);
+            pollTimer = setInterval(loadThread, 5000);
+        }
+
+        // ── Thread ───────────────────────────────────────
+        async function loadThread() {
+            if (!activeContact) return;
+            try {
+                const res = await fetch(`/api/messages/thread?userId=${ME.userId}&otherId=${activeContact.userId}`);
+                if (!res.ok) return;
+                const msgs = await res.json();
+                renderThread(msgs);
+            } catch (e) { /* silent */ }
+        }
+
+        function renderThread(msgs) {
+            const el = document.getElementById('threadMessages');
+            if (!msgs.length) {
+                el.innerHTML = '<div style="text-align:center;color:var(--clr-muted);padding:30px;font-size:.9rem">No messages yet — say hello! 👋</div>';
+                return;
+            }
+
+            let html = '';
+            let lastDate = '';
+
+            msgs.forEach(m => {
+                const mine = m.senderId === ME.userId;
+                const dateStr = m.sentAt ? m.sentAt.substring(0, 10) : '';
+                if (dateStr && dateStr !== lastDate) {
+                    html += `<div class="date-divider"><span>${formatDate(dateStr)}</span></div>`;
+                    lastDate = dateStr;
+                }
+                const time = m.sentAt ? m.sentAt.substring(11, 16) : '';
+                html += `
+            <div class="bubble-wrap ${mine ? 'mine' : 'theirs'}">
+                <div class="bubble ${mine ? 'mine' : 'theirs'}">${esc(m.messageText)}</div>
+                <div class="bubble-time">${esc(time)}${mine ? '' : ' · ' + esc(m.senderName)}</div>
+            </div>`;
+            });
+
+            el.innerHTML = html;
+            // Auto-scroll to bottom
+            el.scrollTop = el.scrollHeight;
+        }
+
+        // ── Send ─────────────────────────────────────────
+        async function sendMessage() {
+            if (!activeContact) return;
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            input.disabled = true;
+
+            try {
+                const res = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderId: ME.userId,
+                        recipientId: activeContact.userId,
+                        messageText: text
+                    })
+                });
+                if (!res.ok) throw new Error('Send failed');
+                input.value = '';
+                input.style.height = 'auto';
+                await loadThread();
+                // Refresh contact list to update last message
+                loadContacts();
+            } catch (e) {
+                alert('Failed to send message. Please try again.');
+            } finally {
+                btn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(ta) {
+            ta.style.height = 'auto';
+            ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+        }
+
+        // ── Helpers ──────────────────────────────────────
+        function esc(v) {
+            return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const today = new Date();
+            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+            if (d.toDateString() === today.toDateString()) return 'Today';
+            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        // ── Cleanup on leave ─────────────────────────────
+        window.addEventListener('beforeunload', () => {
+            if (pollTimer) clearInterval(pollTimer);
+        });
+
+        window.addEventListener('load', initPage);
+    </script>
+    <script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>

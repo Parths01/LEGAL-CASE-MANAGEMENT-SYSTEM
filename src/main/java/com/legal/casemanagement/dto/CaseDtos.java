@@ -160,6 +160,17 @@ public class CaseDtos {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
+    public static class AdvocateOption {
+        private Long advocateId;
+        private Long advocateUserId;
+        private String name;
+        private String specialization;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UploadDocumentRequest {
         private Long caseId;
         private String caseNumber;

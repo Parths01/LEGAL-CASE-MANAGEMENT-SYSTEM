@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    
+
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>Reports Center</h1>
+                    <p class="text-muted">Generate, schedule, and track administrative reports.</p>
+                </div>
+                <span class="role-badge">ADMIN</span>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Total Reports</div>
+                            <div class="value">128</div>
+                            <div class="trend">Updated today</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-file-alt"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Scheduled Reports</div>
+                            <div class="value">8</div>
+                            <div class="trend">Next run in 2h</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-clock"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Exports This Month</div>
+                            <div class="value">42</div>
+                            <div class="trend">+12% MoM</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-file-export"></i></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="kpi">
+                        <div>
+                            <div class="label">Failed Jobs</div>
+                            <div class="value">1</div>
+                            <div class="trend">Last failure 3d ago</div>
+                        </div>
+                        <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h4>Report Builder</h4>
+                <span class="pill">Quick Create</span>
+            </div>
+            <div class="card">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="reportType">Report Type</label>
+                        <select id="reportType">
+                            <option>Case Activity Summary</option>
+                            <option>Revenue & Billing</option>
+                            <option>Compliance & Audit</option>
+                            <option>Advocate Performance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateRange">Date Range</label>
+                        <select id="dateRange">
+                            <option>Last 30 Days</option>
+                            <option>Last Quarter</option>
+                            <option>Year to Date</option>
+                            <option>Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="format">Format</label>
+                        <select id="format">
+                            <option>PDF</option>
+                            <option>XLSX</option>
+                            <option>CSV</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="delivery">Delivery</label>
+                        <select id="delivery">
+                            <option>Download</option>
+                            <option>Email to Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" checked> Include case status breakdown</label>
+                    <label><input type="checkbox" checked> Include advocate assignments</label>
+                    <label><input type="checkbox"> Include client contact list</label>
+                </div>
+                <div class="mt-4 d-flex justify-content-end">
+                    <button class="btn btn-primary"><i class="fas fa-bolt"></i> Generate Report</button>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h4>Recent Reports</h4>
+                <button class="btn btn-outline">View All</button>
+            </div>
+            <div class="content-grid">
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Report</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Last Run</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Monthly Case Activity</td>
+                                <td>Auto</td>
+                                <td><span class="status success">Ready</span></td>
+                                <td>Today</td>
+                            </tr>
+                            <tr>
+                                <td>Revenue & Billing Summary</td>
+                                <td>Manual</td>
+                                <td><span class="status info">Processing</span></td>
+                                <td>1h ago</td>
+                            </tr>
+                            <tr>
+                                <td>Compliance Checklist</td>
+                                <td>Auto</td>
+                                <td><span class="status warn">Review</span></td>
+                                <td>Yesterday</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4>Scheduled Reports</h4>
+                    <ul class="list" style="list-style: none; padding: 0; margin: 0;">
+                        <li class="d-flex justify-content-between"
+                            style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <span>Weekly Active Cases</span>
+                            <span class="status info">Mon 9:00 AM</span>
+                        </li>
+                        <li class="d-flex justify-content-between"
+                            style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <span>Monthly Billing</span>
+                            <span class="status success">1st, 8:00 AM</span>
+                        </li>
+                        <li class="d-flex justify-content-between" style="padding: 10px 0;">
+                            <span>Quarterly Audit</span>
+                            <span class="status warn">Apr 1, 10:00 AM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Updated nav links -->
+    <script>
+        async function loadReportSummary() {
+            try {
+                const res = await fetch('/api/reports/summary');
+                if (!res.ok) return;
+                const d = await res.json();
+
+                // Update KPI cards with real data
+                const kpiCards = document.querySelectorAll('.kpi .value');
+                if (kpiCards[0]) kpiCards[0].textContent = (d.totalCases ?? 0) + ' cases';
+                if (kpiCards[1]) kpiCards[1].textContent = (d.scheduledHearings ?? 0) + ' upcoming';
+                if (kpiCards[2]) kpiCards[2].textContent = '₹' + Number(d.totalRevenue ?? 0).toLocaleString('en-IN');
+                if (kpiCards[3]) kpiCards[3].textContent = (d.pendingTasks ?? 0) + ' pending';
+
+            } catch (e) { /* silently fail */ }
+        }
+
+        function checkAuthorization() {
+            const userRole = (localStorage.getItem('userRole') || '').toUpperCase();
+            const userName = localStorage.getItem('userName');
+
+            if (!userRole) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (userRole !== 'ADMIN') {
+                alert('Unauthorized access. You do not have permission to access this page.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (userName) {
+                const userDisplay = document.getElementById('userDisplay');
+                if (userDisplay) userDisplay.textContent = userName;
+            }
+
+            return true;
+        }
+
+        window.addEventListener('load', () => {
+            if (checkAuthorization()) {
+                loadReportSummary();
+            }
+        });
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                checkAuthorization();
+            }
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+<script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>

@@ -45,6 +45,7 @@ public class ClientDtos {
     @Builder
     public static class ClientListItem {
         private Long clientId;
+        private Long userId;
         private String name;
         private String email;
         private String clientType;

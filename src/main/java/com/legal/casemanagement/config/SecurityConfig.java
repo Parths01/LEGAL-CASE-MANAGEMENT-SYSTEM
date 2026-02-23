@@ -4,54 +4,76 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
-            .authorizeHttpRequests(authorize -> authorize
-                // Allow public access to index page
-                .requestMatchers("/", "/index.html").permitAll()
-                // Allow public access to dashboard pages (role check done on frontend)
-                .requestMatchers("/admin-dashboard.html", "/advocate-dashboard.html", "/client-dashboard.html", "/clerk-dashboard.html").permitAll()
-                // Allow public access to user management and cases pages
-                .requestMatchers("/user-management.html", "/cases.html", "/case-details.html", "/clerk-cases.html", "/advocate-cases.html").permitAll()
-                // Allow public access to create forms
-                .requestMatchers("/create-case.html", "/create-client.html").permitAll()
-                // Allow public access to static resources
-                .requestMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll()
-                // Allow public access to login page
-                .requestMatchers("/login", "/login.html").permitAll()
-                // Allow public access to API login endpoint
-                .requestMatchers("/api/auth/**").permitAll()
-                // Allow public access to dashboard summary API
-                .requestMatchers("/api/dashboard/**").permitAll()
-                // Allow public access to user management API (role check done on frontend)
-                .requestMatchers("/api/users/**").permitAll()
-                // Allow public access to case APIs
-                .requestMatchers("/api/cases/**").permitAll()
-                // Allow public access to client APIs
-                .requestMatchers("/api/clients/**").permitAll()
-                // Require authentication for all other requests
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll()
-            );
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-        return http.build();
-    }
+        public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        }
+
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOriginPatterns(List.of("*"));
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(List.of("*"));
+                config.setAllowCredentials(true);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
+                return source;
+        }
+
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                // Public auth endpoint
+                                                .requestMatchers("/api/auth/**").permitAll()
+
+                                                // Static HTML pages (role-checking done on frontend via JWT)
+                                                .requestMatchers("/", "/index.html", "/login", "/login.html")
+                                                .permitAll()
+                                                .requestMatchers(
+                                                                "/admin-dashboard.html", "/advocate-dashboard.html",
+                                                                "/client-dashboard.html", "/clerk-dashboard.html",
+                                                                "/dashboard.html", "/user-management.html",
+                                                                "/cases.html", "/case-details.html",
+                                                                "/advocate-cases.html", "/clerk-cases.html",
+                                                                "/create-case.html", "/create-client.html",
+                                                                "/client-details.html", "/hearings.html",
+                                                                "/tasks.html", "/invoices.html",
+                                                                "/notices.html", "/messages.html",
+                                                                "/reports.html")
+                                                .permitAll()
+
+                                                // Static assets
+                                                .requestMatchers("/assets/**", "/css/**", "/js/**", "/images/**")
+                                                .permitAll()
+
+                                                // All REST APIs – open for demo (JWT token inspection still done in
+                                                // filter)
+                                                .requestMatchers("/api/**").permitAll()
+
+                                                // Everything else requires authentication
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+                return http.build();
+        }
 }

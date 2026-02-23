@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Smart Legal CMS</title>
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/classic-theme.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="auth-body">
     <div class="auth-container">
@@ -70,17 +72,19 @@
                 console.log('Login response:', data);
 
                 if (response.ok && data.token) {
+                    const normalizedRole = String(data.role || '').toUpperCase().trim();
+
                     // Store token and user info
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
-                    localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('userRole', normalizedRole);
                     localStorage.setItem('userName', data.name);
                     localStorage.setItem('userEmail', data.email);
                     
-                    console.log('Redirecting user with role:', data.role);
+                    console.log('Redirecting user with role:', normalizedRole);
                     
                     // Redirect based on role
-                    redirectUserByRole(data.role);
+                    redirectUserByRole(normalizedRole);
                 } else {
                     showAlert(data.message || 'Login failed. Please check your credentials.');
                     loginBtn.disabled = false;

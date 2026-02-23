@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <h2>Tasks</h2>
+                <p>Assign, track, and complete tasks for each case.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus"></i> New Task</button>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Total Tasks</div>
+                    <div class="kpi-val" id="kpiTotal">-</div>
+                </div>
+                <div class="kpi-icon blue"><i class="fas fa-tasks"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Pending</div>
+                    <div class="kpi-val" id="kpiPending">-</div>
+                </div>
+                <div class="kpi-icon orange"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">In Progress</div>
+                    <div class="kpi-val" id="kpiProgress">-</div>
+                </div>
+                <div class="kpi-icon blue"><i class="fas fa-spinner"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Overdue</div>
+                    <div class="kpi-val" id="kpiOverdue">-</div>
+                </div>
+                <div class="kpi-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="Search task title, case number, assignee..."
+                oninput="filterTable()">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+            </select>
+            <select id="priorityFilter" onchange="filterTable()">
+                <option value="">All Priorities</option>
+                <option value="URGENT">Urgent</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+            </select>
+            <button class="btn btn-outline" onclick="loadTasks()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case #</th>
+                        <th>Task</th>
+                        <th>Assigned To</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tasksBody">
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Task Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-plus-circle"></i> New Task</h3>
+            <div class="form-group"><label>Case Number</label><input id="t_case" placeholder="e.g. LC-2024-001"></div>
+            <div class="form-group"><label>Task Title</label><input id="t_title"
+                    placeholder="e.g. File court fee payment"></div>
+            <div class="form-group"><label>Description</label><textarea id="t_desc" rows="2"></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Priority</label>
+                    <select id="t_priority">
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                        <option value="HIGH">High</option>
+                        <option value="URGENT">Urgent</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Due Date</label><input id="t_due" type="date"></div>
+            </div>
+            <div id="createErr" class="alert alert-danger d-none"
+                style="border-radius:8px;padding:10px 14px;font-size:.88rem;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCreate()"><i class="fas fa-save"></i> Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-box" style="max-width:380px">
+            <h3>Update Task Status</h3>
+            <p style="color:var(--muted);margin-bottom:16px;" id="statusDesc"></p>
+            <div class="form-group"><label>Status</label>
+                <select id="newStatus">
+                    <option value="PENDING">Pending</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitStatus()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTasks = [], currentId = null;
+
+        function initPage() {
+            // Auth check handled by sidebar.js – just load data
+            loadTasks();
+        }
+
+        async function loadTasks() {
+            document.getElementById('tasksBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr>';
+            try {
+                const res = await fetch('/api/tasks');
+                if (!res.ok) throw 0;
+                allTasks = await res.json();
+                updateKPIs(); renderTable(allTasks);
+            } catch (e) { document.getElementById('tasksBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Failed to load tasks.</td></tr>'; }
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpiTotal').textContent = allTasks.length;
+            document.getElementById('kpiPending').textContent = allTasks.filter(t => t.status === 'PENDING').length;
+            document.getElementById('kpiProgress').textContent = allTasks.filter(t => t.status === 'IN_PROGRESS').length;
+            document.getElementById('kpiOverdue').textContent = allTasks.filter(t => t.overdue).length;
+        }
+
+        function bc(s) { return { PENDING: 'b-pending', IN_PROGRESS: 'b-progress', COMPLETED: 'b-done', CANCELLED: 'b-cancel' }[s] || 'b-pending'; }
+        function pc(p) { return { URGENT: 'p-urgent', HIGH: 'p-high', MEDIUM: 'p-medium', LOW: 'p-low' }[p] || 'p-medium'; }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tasksBody');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-tasks" style="font-size:3rem;opacity:.4;display:block;margin-bottom:12px;"></i>No tasks found</div></td></tr>'; return; }
+            tbody.innerHTML = data.map(t => `
+        <tr class="${t.overdue ? 'overdue-row' : ''}">
+            <td><strong>${esc(t.caseNumber)}</strong></td>
+            <td>${esc(t.taskTitle)}${t.overdue ? '<br><span class="overdue-col"><i class="fas fa-exclamation-circle"></i> OVERDUE</span>' : ''}</td>
+            <td>${esc(t.assignedToName || 'Unassigned')}</td>
+            <td>${esc(t.dueDate)}</td>
+            <td><span class="${pc(t.priority)}">${esc(t.priority)}</span></td>
+            <td><span class="badge ${bc(t.status)}">${esc(t.status)}</span></td>
+            <td><button class="btn btn-sm btn-outline" onclick="openStatusModal(${t.taskId},'${esc(t.taskTitle)}')"><i class="fas fa-edit"></i> Update</button></td>
+        </tr>`).join('');
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const s = document.getElementById('statusFilter').value;
+            const p = document.getElementById('priorityFilter').value;
+            renderTable(allTasks.filter(t => {
+                const mq = !q || (t.taskTitle || '').toLowerCase().includes(q) || (t.caseNumber || '').toLowerCase().includes(q) || (t.assignedToName || '').toLowerCase().includes(q);
+                return mq && (!s || t.status === s) && (!p || t.priority === p);
+            }));
+        }
+
+        function openCreateModal() { document.getElementById('createErr').classList.add('d-none'); document.getElementById('createModal').classList.add('open'); }
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+        async function submitCreate() {
+            const caseNumber = document.getElementById('t_case').value.trim();
+            const taskTitle = document.getElementById('t_title').value.trim();
+            if (!caseNumber || !taskTitle) { const e = document.getElementById('createErr'); e.textContent = 'Case number and task title are required.'; e.classList.remove('d-none'); return; }
+            try {
+                const res = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseNumber, taskTitle, description: document.getElementById('t_desc').value, priority: document.getElementById('t_priority').value, dueDate: document.getElementById('t_due').value || null }) });
+                if (!res.ok) { const e = document.getElementById('createErr'); e.textContent = 'Failed to create task.'; e.classList.remove('d-none'); return; }
+                closeCreateModal(); loadTasks();
+            } catch (e) { const el = document.getElementById('createErr'); el.textContent = 'Server error.'; el.classList.remove('d-none'); }
+        }
+
+        function openStatusModal(id, title) { currentId = id; document.getElementById('statusDesc').textContent = title; document.getElementById('statusModal').classList.add('open'); }
+        function closeStatusModal() { document.getElementById('statusModal').classList.remove('open'); currentId = null; }
+
+        async function submitStatus() {
+            if (!currentId) return;
+            try { await fetch(`/api/tasks/${currentId}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: document.getElementById('newStatus').value }) }); closeStatusModal(); loadTasks(); }
+            catch (e) { alert('Failed to update.'); }
+        }
+
+        function esc(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+        window.addEventListener('load', loadTasks);
+    </script>
+    <script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>

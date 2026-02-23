@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 -- Messages Table
 CREATE TABLE IF NOT EXISTS messages (
     message_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    case_id BIGINT NOT NULL,
+    case_id BIGINT NULL,
     sender_id BIGINT NOT NULL,
     recipient_id BIGINT NOT NULL,
     subject VARCHAR(300),

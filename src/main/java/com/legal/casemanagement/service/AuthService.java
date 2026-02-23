@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -24,33 +25,70 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request) {
-        Optional<User> userOpt = userRepository.findByEmailAndStatus(request.getEmail(), "ACTIVE");
+        if (request == null || request.getEmail() == null || request.getPassword() == null) {
+            return LoginResponse.builder()
+                    .message("Email and password are required")
+                    .build();
+        }
+
+        String email = request.getEmail().trim();
+        String rawPassword = request.getPassword();
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
+            return LoginResponse.builder()
+                    .message("User not found")
+                    .build();
+        }
+
+        User user = userOpt.get();
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
             return LoginResponse.builder()
                     .message("User not found or account is inactive")
                     .build();
         }
 
-        User user = userOpt.get();
-
-        // Verify password
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!isPasswordValidAndMigrateIfNeeded(user, rawPassword)) {
             return LoginResponse.builder()
                     .message("Invalid password")
                     .build();
         }
 
+        String normalizedRole = user.getRole() == null
+                ? ""
+                : user.getRole().trim().toUpperCase(Locale.ROOT);
+
         // Generate JWT token
-        String token = jwtUtil.generateToken(user.getUserId(), user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user.getUserId(), user.getEmail(), normalizedRole);
 
         return LoginResponse.builder()
                 .token(token)
                 .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .role(user.getRole())
+                .role(normalizedRole)
                 .message("Login successful")
                 .build();
+    }
+
+    private boolean isPasswordValidAndMigrateIfNeeded(User user, String rawPassword) {
+        String storedPassword = user.getPassword();
+        if (storedPassword == null || storedPassword.isBlank()) {
+            return false;
+        }
+
+        if (storedPassword.startsWith("$2")) {
+            return passwordEncoder.matches(rawPassword, storedPassword);
+        }
+
+        // Legacy plain-text compatibility: allow once and migrate to BCrypt.
+        if (rawPassword.equals(storedPassword)) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
     }
 }

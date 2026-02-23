@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Legal CMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <h1>Dashboard</h1>
+            <div id="dashboard-content"></div>
+        </div>
+    </div>
+    <script>
+        const userRole = (localStorage.getItem('userRole') || '').toUpperCase();
+
+        if (!userRole) {
+            window.location.href = 'login.html';
+        }
+
+        function renderDashboard(role) {
+            let html = '';
+            if (role === 'ADMIN') {
+                html += `<h2>Admin Dashboard</h2>`;
+                html += `<div>Admin-specific content here...</div>`;
+            } else if (role === 'ADVOCATE') {
+                html += `<h2>Advocate Dashboard</h2>`;
+                html += `<div>Advocate-specific content here...</div>`;
+            } else if (role === 'CLIENT') {
+                html += `<h2>Client Dashboard</h2>`;
+                html += `<div>Client-specific content here...</div>`;
+            } else if (role === 'CLERK') {
+                html += `<h2>Clerk Dashboard</h2>`;
+                html += `<div>Clerk-specific content here...</div>`;
+            } else {
+                html += `<h2>Dashboard</h2><div>Unknown role.</div>`;
+            }
+            document.getElementById('dashboard-content').innerHTML = html;
+        }
+        renderDashboard(userRole);
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <h2>Invoices</h2>
+                <p>Manage billing, track payments, and generate invoices for clients.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus"></i> New Invoice</button>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Total Invoices</div>
+                    <div class="kpi-val" id="kpiTotal">-</div>
+                </div>
+                <div class="kpi-icon blue"><i class="fas fa-file-invoice"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Paid</div>
+                    <div class="kpi-val" id="kpiPaid">-</div>
+                </div>
+                <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Pending</div>
+                    <div class="kpi-val" id="kpiPending">-</div>
+                </div>
+                <div class="kpi-icon orange"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Overdue</div>
+                    <div class="kpi-val" id="kpiOverdue">-</div>
+                </div>
+                <div class="kpi-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="Search by case number, client, invoice #..."
+                oninput="filterTable()">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="">All Statuses</option>
+                <option value="DRAFT">Draft</option>
+                <option value="SENT">Sent</option>
+                <option value="PAID">Paid</option>
+                <option value="OVERDUE">Overdue</option>
+                <option value="CANCELLED">Cancelled</option>
+            </select>
+            <button class="btn btn-outline" onclick="loadInvoices()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Case</th>
+                        <th>Client</th>
+                        <th>Invoice Date</th>
+                        <th>Due Date</th>
+                        <th>Amount (₹)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="invoicesBody">
+                    <tr>
+                        <td colspan="8" class="text-center p-4" style="color: var(--muted);">Loading…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Invoice Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-file-invoice-dollar"></i> New Invoice</h3>
+            <div class="form-group">
+                <label>Case Number</label>
+                <input id="inv_caseNumber" type="text" placeholder="e.g. LC-2024-001">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Invoice Date</label>
+                    <input id="inv_invoiceDate" type="date">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input id="inv_dueDate" type="date">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input id="inv_amount" type="number" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Tax (₹)</label>
+                    <input id="inv_tax" type="number" min="0" step="0.01" placeholder="0.00">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Discount (₹)</label>
+                <input id="inv_discount" type="number" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="inv_notes" rows="3" placeholder="Optional notes…"></textarea>
+            </div>
+            <div id="createError" class="alert alert-danger d-none"
+                style="border-radius:8px; padding:10px 14px; font-size:.88rem;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCreateInvoice()"><i class="fas fa-save"></i> Create
+                    Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-box" style="max-width:380px">
+            <h3>Update Invoice Status</h3>
+            <p style="color:var(--muted); margin-bottom:16px;" id="statusModalDesc"></p>
+            <div class="form-group">
+                <label>New Status</label>
+                <select id="newStatus">
+                    <option value="DRAFT">Draft</option>
+                    <option value="SENT">Sent</option>
+                    <option value="PAID">Paid</option>
+                    <option value="OVERDUE">Overdue</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitStatusUpdate()">Update</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let allInvoices = [];
+        let currentInvoiceId = null;
+
+        function getToken() { return localStorage.getItem('token') || ''; }
+        function getRole() { return (localStorage.getItem('userRole') || '').toUpperCase(); }
+        function getName() { return localStorage.getItem('userName') || ''; }
+
+        function initPage() {
+            // Auth check handled by sidebar.js – just load data
+            loadInvoices();
+        }
+
+        async function loadInvoices() {
+            const tbody = document.getElementById('invoicesBody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr>';
+            try {
+                const res = await fetch('/api/invoices');
+                if (!res.ok) throw new Error('Failed to load');
+                allInvoices = await res.json();
+                updateKPIs();
+                renderTable(allInvoices);
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Failed to load invoices. Please check your connection.</td></tr>`;
+            }
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpiTotal').textContent = allInvoices.length;
+            document.getElementById('kpiPaid').textContent = allInvoices.filter(i => i.status === 'PAID').length;
+            document.getElementById('kpiPending').textContent = allInvoices.filter(i => ['DRAFT', 'SENT'].includes(i.status)).length;
+            document.getElementById('kpiOverdue').textContent = allInvoices.filter(i => i.status === 'OVERDUE').length;
+        }
+
+        function statusBadge(s) {
+            const map = { DRAFT: 'badge-draft', SENT: 'badge-sent', PAID: 'badge-paid', OVERDUE: 'badge-overdue', CANCELLED: 'badge-cancelled' };
+            return `<span class="badge ${map[s] || 'badge-draft'}">${s || 'DRAFT'}</span>`;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('invoicesBody');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><br>No invoices found</div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map(inv => `
+        <tr>
+            <td><strong>${esc(inv.invoiceNumber)}</strong></td>
+            <td>${esc(inv.caseNumber)}</td>
+            <td>${esc(inv.clientName)}</td>
+            <td>${esc(inv.invoiceDate)}</td>
+            <td>${esc(inv.dueDate)}</td>
+            <td><strong>₹${Number(inv.totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></td>
+            <td>${statusBadge(inv.status)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline" onclick="openStatusModal(${inv.invoiceId}, '${esc(inv.invoiceNumber)}')">
+                    <i class="fas fa-edit"></i> Update
+                </button>
+            </td>
+        </tr>
+    `).join('');
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const s = document.getElementById('statusFilter').value;
+            const filtered = allInvoices.filter(i => {
+                const matchQ = !q || (i.invoiceNumber || '').toLowerCase().includes(q) || (i.clientName || '').toLowerCase().includes(q) || (i.caseNumber || '').toLowerCase().includes(q);
+                const matchS = !s || i.status === s;
+                return matchQ && matchS;
+            });
+            renderTable(filtered);
+        }
+
+        function openCreateModal() {
+            document.getElementById('inv_invoiceDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('createError').classList.add('d-none');
+            document.getElementById('createModal').classList.add('open');
+        }
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+        async function submitCreateInvoice() {
+            const caseNumber = document.getElementById('inv_caseNumber').value.trim();
+            const amount = parseFloat(document.getElementById('inv_amount').value);
+            if (!caseNumber || isNaN(amount) || amount <= 0) {
+                showError('createError', 'Case number and a valid amount are required.');
+                return;
+            }
+            const payload = {
+                caseNumber,
+                invoiceDate: document.getElementById('inv_invoiceDate').value,
+                dueDate: document.getElementById('inv_dueDate').value,
+                amount,
+                tax: parseFloat(document.getElementById('inv_tax').value) || 0,
+                discount: parseFloat(document.getElementById('inv_discount').value) || 0,
+                notes: document.getElementById('inv_notes').value
+            };
+            try {
+                const res = await fetch('/api/invoices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!res.ok) { showError('createError', 'Failed to create invoice.'); return; }
+                closeCreateModal();
+                loadInvoices();
+            } catch (e) { showError('createError', 'Server error.'); }
+        }
+
+        function openStatusModal(id, number) {
+            currentInvoiceId = id;
+            document.getElementById('statusModalDesc').textContent = `Invoice: ${number}`;
+            document.getElementById('statusModal').classList.add('open');
+        }
+        function closeStatusModal() { document.getElementById('statusModal').classList.remove('open'); currentInvoiceId = null; }
+
+        async function submitStatusUpdate() {
+            if (!currentInvoiceId) return;
+            const status = document.getElementById('newStatus').value;
+            try {
+                await fetch(`/api/invoices/${currentInvoiceId}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+                closeStatusModal();
+                loadInvoices();
+            } catch (e) { alert('Failed to update status.'); }
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (el) { el.textContent = msg; el.classList.remove('d-none'); }
+        }
+        function esc(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+
+        window.addEventListener('load', loadInvoices);
+    </script>
+    <script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>

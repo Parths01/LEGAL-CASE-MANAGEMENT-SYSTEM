@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Notices - Smart Legal CMS</title>
+    <link rel="stylesheet" href="/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <h2>Legal Notices</h2>
+                <p>Draft, send, and track legal notices for all cases.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus"></i> New Notice</button>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Total</div>
+                    <div class="kpi-val" id="kpiTotal">-</div>
+                </div>
+                <div class="kpi-icon blue"><i class="fas fa-file-alt"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Draft</div>
+                    <div class="kpi-val" id="kpiDraft">-</div>
+                </div>
+                <div class="kpi-icon orange"><i class="fas fa-pen"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Sent</div>
+                    <div class="kpi-val" id="kpiSent">-</div>
+                </div>
+                <div class="kpi-icon purple"><i class="fas fa-paper-plane"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-lbl">Acknowledged</div>
+                    <div class="kpi-val" id="kpiAck">-</div>
+                </div>
+                <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="Search case, recipient, type..." oninput="filterTable()">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="">All Statuses</option>
+                <option value="DRAFT">Draft</option>
+                <option value="SENT">Sent</option>
+                <option value="ACKNOWLEDGED">Acknowledged</option>
+                <option value="REJECTED">Rejected</option>
+            </select>
+            <button class="btn btn-outline" onclick="loadNotices()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case #</th>
+                        <th>Case Title</th>
+                        <th>Type</th>
+                        <th>Recipient</th>
+                        <th>Sent Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="noticesBody">
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Notice Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-plus-circle"></i> New Legal Notice</h3>
+            <div class="form-group"><label>Case Number</label><input id="n_case" placeholder="e.g. LC-2024-001"></div>
+            <div class="form-group"><label>Notice Type</label>
+                <select id="n_type">
+                    <option value="DEMAND">Demand</option>
+                    <option value="CEASE_DESIST">Cease & Desist</option>
+                    <option value="EVICTION">Eviction</option>
+                    <option value="BREACH_CONTRACT">Breach of Contract</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Recipient Name</label><input id="n_recipient"
+                    placeholder="Full name of recipient"></div>
+            <div class="form-group"><label>Recipient Address</label><textarea id="n_address" rows="2"
+                    placeholder="Full postal address"></textarea></div>
+            <div class="form-group"><label>Notice Content</label><textarea id="n_content" rows="5"
+                    placeholder="Legal notice text..."></textarea></div>
+            <div class="form-group"><label>Sent Date</label><input id="n_date" type="date"></div>
+            <div id="createErr" class="alert alert-danger d-none"
+                style="border-radius:8px;padding:10px 14px;font-size:.88rem;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCreate()"><i class="fas fa-save"></i> Create
+                    Notice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-box" style="max-width:380px">
+            <h3>Update Notice Status</h3>
+            <p style="color:var(--muted);margin-bottom:16px;" id="statusDesc"></p>
+            <div class="form-group"><label>New Status</label>
+                <select id="newStatus">
+                    <option value="DRAFT">Draft</option>
+                    <option value="SENT">Sent</option>
+                    <option value="ACKNOWLEDGED">Acknowledged</option>
+                    <option value="REJECTED">Rejected</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitStatus()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allNotices = [], currentId = null;
+
+        function initPage() {
+            // Auth check handled by sidebar.js – just load data
+            loadNotices();
+        }
+
+        async function loadNotices() {
+            document.getElementById('noticesBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr>';
+            try {
+                const res = await fetch('/api/notices');
+                if (!res.ok) throw 0;
+                allNotices = await res.json();
+                document.getElementById('kpiTotal').textContent = allNotices.length;
+                document.getElementById('kpiDraft').textContent = allNotices.filter(n => n.status === 'DRAFT').length;
+                document.getElementById('kpiSent').textContent = allNotices.filter(n => n.status === 'SENT').length;
+                document.getElementById('kpiAck').textContent = allNotices.filter(n => n.status === 'ACKNOWLEDGED').length;
+                renderTable(allNotices);
+            } catch (e) { document.getElementById('noticesBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Failed to load notices.</td></tr>'; }
+        }
+
+        function bc(s) { return { DRAFT: 'b-draft', SENT: 'b-sent', ACKNOWLEDGED: 'b-ack', REJECTED: 'b-rejected' }[s] || 'b-draft'; }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('noticesBody');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state" style="text-align:center;padding:60px;"><i class="fas fa-envelope-open-text" style="font-size:3rem;opacity:.4;display:block;margin-bottom:12px;"></i>No notices found</div></td></tr>'; return; }
+            tbody.innerHTML = data.map(n => `
+        <tr>
+            <td><strong>${esc(n.caseNumber)}</strong></td>
+            <td>${esc(n.caseTitle)}</td>
+            <td>${esc(n.noticeType)}</td>
+            <td>${esc(n.recipientName)}</td>
+            <td>${esc(n.sentDate)}</td>
+            <td><span class="badge ${bc(n.status)}">${esc(n.status)}</span></td>
+            <td><button class="btn btn-sm btn-outline" onclick="openStatusModal(${n.noticeId},'${esc(n.noticeType)} – ${esc(n.caseNumber)}')"><i class="fas fa-edit"></i> Update</button></td>
+        </tr>`).join('');
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const s = document.getElementById('statusFilter').value;
+            renderTable(allNotices.filter(n => {
+                const mq = !q || (n.caseNumber || '').toLowerCase().includes(q) || (n.recipientName || '').toLowerCase().includes(q) || (n.noticeType || '').toLowerCase().includes(q);
+                return mq && (!s || n.status === s);
+            }));
+        }
+
+        function openCreateModal() { document.getElementById('n_date').value = new Date().toISOString().split('T')[0]; document.getElementById('createErr').classList.add('d-none'); document.getElementById('createModal').classList.add('open'); }
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+        async function submitCreate() {
+            const caseNumber = document.getElementById('n_case').value.trim();
+            const recipientName = document.getElementById('n_recipient').value.trim();
+            const content = document.getElementById('n_content').value.trim();
+            if (!caseNumber || !recipientName || !content) { const e = document.getElementById('createErr'); e.textContent = 'Case number, recipient name and content are required.'; e.classList.remove('d-none'); return; }
+            try {
+                const res = await fetch('/api/notices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseNumber, noticeType: document.getElementById('n_type').value, recipientName, recipientAddress: document.getElementById('n_address').value, content, sentDate: document.getElementById('n_date').value || null }) });
+                if (!res.ok) { const e = document.getElementById('createErr'); e.textContent = 'Failed to create notice.'; e.classList.remove('d-none'); return; }
+                closeCreateModal(); loadNotices();
+            } catch (e) { const el = document.getElementById('createErr'); el.textContent = 'Server error.'; el.classList.remove('d-none'); }
+        }
+
+        function openStatusModal(id, desc) { currentId = id; document.getElementById('statusDesc').textContent = desc; document.getElementById('statusModal').classList.add('open'); }
+        function closeStatusModal() { document.getElementById('statusModal').classList.remove('open'); currentId = null; }
+
+        async function submitStatus() {
+            if (!currentId) return;
+            try { await fetch(`/api/notices/${currentId}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: document.getElementById('newStatus').value }) }); closeStatusModal(); loadNotices(); }
+            catch (e) { alert('Failed to update.'); }
+        }
+
+        function esc(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+        window.addEventListener('load', loadNotices);
+    </script>
+    <script src="/assets/js/sidebar.js"></script>
+</body>
+
+</html>
